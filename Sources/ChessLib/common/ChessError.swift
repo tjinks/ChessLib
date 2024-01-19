@@ -9,4 +9,5 @@ import Foundation
 
 enum ChessError : Error {
     case invalidSquare
+    case invalidFen
 }
