@@ -28,6 +28,15 @@ public struct Square: CustomStringConvertible, Equatable, Hashable {
         return SquareFactory.getAll()
     }
     
+    public static func getRank(_ rank: Int) throws -> [Square] {
+        var result: [Square] = []
+        for file in 0...7 {
+            try result.append(get(file: file, rank: rank))
+        }
+        
+        return result
+    }
+    
     public var description: String {
         let fileChars = ["a", "b", "c", "d", "e", "f", "g", "h"]
         let rankChars = ["1", "2", "3", "4", "5", "6", "7", "8"]

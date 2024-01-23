@@ -21,4 +21,7 @@ public struct PositionDto {
     public var halfMoveClock: Int = 0
     
     public var fullMove: Int = 0
+    
+    public init() {
+    }
 }

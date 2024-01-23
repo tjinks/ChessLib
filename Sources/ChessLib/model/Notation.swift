@@ -8,6 +8,7 @@
 import Foundation
 
 public class Notation {
+    public static let initialPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     
     public static func parseFen(fen: String) throws -> PositionDto {
         let boardIndex = 0
