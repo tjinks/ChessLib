@@ -20,7 +20,7 @@ public class Notation {
         
         var rank: Int = 7
         var file: Int = 0
-        var positionDto = PositionDto()
+        let positionDto = PositionDto()
         
         let parts = split()
         if parts.count < playerIndex + 1 {

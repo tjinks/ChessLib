@@ -7,6 +7,6 @@
 
 import Foundation
 
-public enum CastlingRight {
-    case whiteK, blackK, whiteQ, blackQ
+public enum CastlingRight: Int {
+    case whiteK = 1, blackK = 2, whiteQ = 4, blackQ = 8
 }

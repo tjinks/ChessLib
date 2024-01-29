@@ -9,7 +9,7 @@ import Foundation
 
 public typealias Pieces = Dictionary<Square, Piece>
 
-public struct PositionDto {
+public class PositionDto {
     public var pieces: Pieces = [:]
     
     public var activePlayer: Player = .white
@@ -24,4 +24,6 @@ public struct PositionDto {
     
     public init() {
     }
+    
+    public static let initialPosition = try! Notation.parseFen(fen: Notation.initialPosition)
 }
