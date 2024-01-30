@@ -43,8 +43,8 @@ struct SquareInfo {
     
     private static func getSlidingMoves(x: Int, y: Int, dx: Int, dy: Int) -> Int64 {
         var result = sentinel
-        var x = x
-        var y = y
+        var x = x + dx
+        var y = y + dy
         while addIfValid(&result, x, y) {
             x += dx
             y += dy
