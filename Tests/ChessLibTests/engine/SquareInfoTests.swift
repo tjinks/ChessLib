@@ -118,6 +118,26 @@ final class SquareInfoTests: XCTestCase {
         XCTAssertTrue(blackPawnCaptures.contains(10))
     }
 
+    func testPawnCapturesAtLeftBoardEdge() throws {
+        let whitePawnCaptures = getSquares(SquareInfo(square: 16).pawnCaptures[Int(Player.white.rawValue)])
+        XCTAssertEqual(1, whitePawnCaptures.count)
+        XCTAssertTrue(whitePawnCaptures.contains(25))
+
+        let blackPawnCaptures = getSquares(SquareInfo(square: 16).pawnCaptures[Int(Player.black.rawValue)])
+        XCTAssertEqual(1, blackPawnCaptures.count)
+        XCTAssertTrue(blackPawnCaptures.contains(9))
+    }
+
+    func testPawnCapturesAtRightBoardEdge() throws {
+        let whitePawnCaptures = getSquares(SquareInfo(square: 23).pawnCaptures[Int(Player.white.rawValue)])
+        XCTAssertEqual(1, whitePawnCaptures.count)
+        XCTAssertTrue(whitePawnCaptures.contains(30))
+
+        let blackPawnCaptures = getSquares(SquareInfo(square: 23).pawnCaptures[Int(Player.black.rawValue)])
+        XCTAssertEqual(1, blackPawnCaptures.count)
+        XCTAssertTrue(blackPawnCaptures.contains(14))
+    }
+
     func testKingMoves() throws {
         var result = getSquares(SquareInfo(square: 0).kingMoves)
         XCTAssertEqual(3, result.count)

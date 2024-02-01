@@ -41,11 +41,11 @@ struct Position: Equatable, Hashable {
         case .normal(let from, let to):
             board[to] = board[from]
             board[from] = .none
-            if board[to] == .whitePawn && to - from == 16 {
+            if board[to] == Piece(.white, .pawn) && to - from == 16 {
                 epSquare = to - 8
             }
             
-            if board[to] == .blackPawn && from - to == 16 {
+            if board[to] == Piece(.black, .pawn) && from - to == 16 {
                 epSquare = to + 8
             }
         case .epCapture(let from):
@@ -57,25 +57,25 @@ struct Position: Equatable, Hashable {
         case .castleK:
             if currentPosition.playerToMove == .white {
                 board[Position.e1] = .none
-                board[Position.f1] = .whiteRook
-                board[Position.g1] = .whiteKing
+                board[Position.f1] = Piece(.white, .rook)
+                board[Position.g1] = Piece(.white, .king)
                 board[Position.h1] = .none
             } else {
                 board[Position.e8] = .none
-                board[Position.f8] = .blackRook
-                board[Position.g8] = .blackKing
+                board[Position.f8] = Piece(.black, .rook)
+                board[Position.g8] = Piece(.black, .king)
                 board[Position.h8] = .none
             }
         case .castleQ:
             if currentPosition.playerToMove == .white {
                 board[Position.e1] = .none
-                board[Position.d1] = .whiteRook
-                board[Position.c1] = .whiteKing
+                board[Position.d1] = Piece(.white, .rook)
+                board[Position.c1] = Piece(.white, .king)
                 board[Position.a1] = .none
             } else {
                 board[Position.e8] = .none
-                board[Position.d8] = .blackRook
-                board[Position.c8] = .blackKing
+                board[Position.d8] = Piece(.black, .rook)
+                board[Position.c8] = Piece(.black, .king)
                 board[Position.a8] = .none
             }
         }
@@ -98,6 +98,7 @@ struct Position: Equatable, Hashable {
                 switch player {
                 case .white: rightsToRemove = whiteCanCastleK | whiteCanCastleQ
                 case .black: rightsToRemove = blackCanCastleK | blackCanCastleQ
+                case .none: break
                 }
             case .normal(let from, _):
                 switch from {
@@ -116,34 +117,35 @@ struct Position: Equatable, Hashable {
         }
     }
     
-    init(positionDto: PositionDto) {
+    init(positionDto: Dto.Position) {
         var board: [Piece] = []
-        for square in Square.getAll() {
-            if let p = positionDto.pieces[square] {
-                board.append(p)
-            } else {
-                board.append(.none)
-            }
+        for squareNumber in 0...63 {
+            board.append(Piece(positionDto.getPiece(at: try! Dto.Square(number: squareNumber))))
         }
         
         self.board = board
         
-        playerToMove = positionDto.activePlayer
+        switch positionDto.playerToMove {
+        case .white:
+            playerToMove = .white
+        case .black:
+            playerToMove = .black
+        }
         
         var castlingRights: Int8 = 0
-        if positionDto.castlingRights.contains(.whiteK) {
+        if positionDto.castlingRights.contains(.whiteKingside) {
             castlingRights |= whiteCanCastleK
         }
         
-        if positionDto.castlingRights.contains(.whiteQ) {
+        if positionDto.castlingRights.contains(.whiteQueenside) {
             castlingRights |= whiteCanCastleQ
         }
         
-        if positionDto.castlingRights.contains(.blackK) {
+        if positionDto.castlingRights.contains(.blackKingside) {
             castlingRights |= blackCanCastleK
         }
         
-        if positionDto.castlingRights.contains(.blackQ) {
+        if positionDto.castlingRights.contains(.blackQueenside) {
             castlingRights |= blackCanCastleQ
         }
         
