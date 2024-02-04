@@ -8,6 +8,9 @@
 import Foundation
 
 enum ChessError : Error {
+    case internalError(message: String)
     case invalidSquare
     case invalidFen
+    case missingKing
+    case duplicateKing
 }

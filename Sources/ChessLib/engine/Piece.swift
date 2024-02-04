@@ -10,7 +10,6 @@ import Foundation
 enum Player: Int8 {
     case white = 0
     case black = 1
-    case none = 2
 }
 
 extension Player {
@@ -18,8 +17,11 @@ extension Player {
         switch self {
         case .black: return .white
         case .white: return .black
-        case .none: return .none
         }
+    }
+    
+    var index: Int {
+        return Int(self.rawValue)
     }
 }
 
@@ -34,11 +36,11 @@ enum PieceType: Int8 {
 }
 
 struct Piece: Equatable, Hashable {
-    static let none = Piece(.none, .none)
-    let owner: Player
+    static let none = Piece(nil, .none)
+    let owner: Player?
     let type: PieceType
     
-    init(_ owner: Player, _ type: PieceType) {
+    init(_ owner: Player?, _ type: PieceType) {
         self.owner = owner
         self.type = type
     }

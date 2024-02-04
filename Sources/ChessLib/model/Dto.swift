@@ -23,14 +23,14 @@ public enum Dto {
         case pawn(owner: Player)
     }
     
-    public enum CastlingRight {
+    public enum CastlingOption {
         case whiteKingside
         case whiteQueenside
         case blackKingside
         case blackQueenside
     }
     
-    public typealias CastlingRights = Set<CastlingRight>
+    public typealias CastlingRights = Set<CastlingOption>
     
     public struct Square: CustomStringConvertible, Equatable, Hashable {
         public let rank: Int
