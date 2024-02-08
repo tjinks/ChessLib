@@ -13,12 +13,68 @@ let blackKingside: Int8 = 4
 let blackQueenside: Int8 = 8
 
 let a1 = 0
+let b1 = 1
 let c1 = 2
 let d1 = 3
 let e1 = 4
 let f1 = 5
 let g1 = 6
 let h1 = 7
+
+let a2 = 8
+let b2 = 9
+let c2 = 10
+let d2 = 11
+let e2 = 12
+let f2 = 13
+let g2 = 14
+let h2 = 15
+
+let a3 = 16
+let b3 = 17
+let c3 = 18
+let d3 = 19
+let e3 = 20
+let f3 = 21
+let g3 = 22
+let h3 = 23
+
+let a4 = 24
+let b4 = 25
+let c4 = 26
+let d4 = 27
+let e4 = 28
+let f4 = 29
+let g4 = 30
+let h4 = 31
+
+let a5 = 32
+let b5 = 33
+let c5 = 34
+let d5 = 35
+let e5 = 36
+let f5 = 37
+let g5 = 38
+let h5 = 39
+
+let a6 = 40
+let b6 = 41
+let c6 = 42
+let d6 = 43
+let e6 = 44
+let f6 = 45
+let g6 = 46
+let h6 = 47
+
+let a7 = 48
+let b7 = 49
+let c7 = 50
+let d7 = 51
+let e7 = 52
+let f7 = 53
+let g7 = 54
+let h7 = 55
+
 let a8 = a1 + 56
 let c8 = c1 + 56
 let d8 = d1 + 56
@@ -45,6 +101,11 @@ struct Position: Equatable, Hashable {
     
     init() {
         let dto = try! Notation.parseFen(fen: Notation.initialPosition)
+        try! self.init(positionDto: dto)
+    }
+    
+    init(fen: String) throws {
+        let dto = try! Notation.parseFen(fen: fen)
         try! self.init(positionDto: dto)
     }
     

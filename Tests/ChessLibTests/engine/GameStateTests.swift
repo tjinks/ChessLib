@@ -19,7 +19,7 @@ final class GameStateTests: XCTestCase {
     func testMakeMove() throws {
         var position = Position()
         var gameState = GameState(initialPosition: position, initialHalfMoveClock: 0, initialFullMove: 1)
-        position = gameState.makeMove(Move(from: 6, to: 21, piece: Piece(.white, .knight)))
+        position = gameState.makeMove(Move(from: g1, to: f3, piece: Piece(.white, .knight)))
         XCTAssertEqual(Player.black, position.playerToMove)
         XCTAssert(position == gameState.currentPosition)
     }
@@ -27,16 +27,20 @@ final class GameStateTests: XCTestCase {
     func testRetractLastMove() throws {
         var position = Position()
         var gameState = GameState(initialPosition: position, initialHalfMoveClock: 0, initialFullMove: 1)
-        gameState.makeMove(Move(from: 6, to: 21, piece: Piece(.white, .knight)))
+        gameState.makeMove(Move(from: g1, to: f3, piece: Piece(.white, .knight)))
         position = gameState.retractLastMove()!
         XCTAssert(position == Position())
         XCTAssertNil(gameState.retractLastMove())
     }
     
     func testGetRepetitionCount() throws {
-        var position = Position()
-        var gameState = GameState(initialPosition: position, initialHalfMoveClock: 0, initialFullMove: 1)
-        gameState.makeMove(Move(from: 12, to: 20, piece: Piece(.white, .pawn)))
-        
+        let initialPosition = Position()
+        var gameState = GameState(initialPosition: initialPosition, initialHalfMoveClock: 0, initialFullMove: 1)
+        gameState.makeMove(Move(from: g1, to: f3, piece: Piece(.white, .knight)))
+        gameState.makeMove(Move(from: g8, to: f6, piece: Piece(.black, .knight)))
+        gameState.makeMove(Move(from: f3, to: g1, piece: Piece(.white, .knight)))
+        gameState.makeMove(Move(from: f6, to: g8, piece: Piece(.black, .knight)))
+        let repetitionCount = gameState.getRepetitionCount()
+        XCTAssertEqual(2, repetitionCount)
     }
 }

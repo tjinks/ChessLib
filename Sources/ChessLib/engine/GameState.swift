@@ -54,7 +54,7 @@ struct GameState {
     }
     
     func getRepetitionCount() -> Int {
-        var result = 0
+        var result = 1
         let hash = currentPosition.hashValue
         var historyIndex = history.count - 2
         while historyIndex >= 0 {

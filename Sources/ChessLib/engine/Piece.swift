@@ -35,6 +35,16 @@ enum PieceType: Int8 {
     case pawn = 6
 }
 
+extension PieceType {
+    func movesOrthogonally() -> Bool {
+        return self == .rook || self == .queen
+    }
+    
+    func movesDiagonally() -> Bool {
+        return self == .bishop || self == .queen
+    }
+}
+
 struct Piece: Equatable, Hashable {
     static let none = Piece(nil, .none)
     let owner: Player?
