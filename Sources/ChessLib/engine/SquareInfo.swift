@@ -7,6 +7,7 @@
 
 import Foundation
 
+let sentinel: Int64 = 0xFF
 
 struct SquareInfo {
     let north: Int64
@@ -21,10 +22,28 @@ struct SquareInfo {
     let kingMoves: Int64
     let pawnMoves: [Int64]
     let pawnCaptures: [Int64]
+    private static let instanceData = InstanceData()
     
-    private static let sentinel: Int64 = 0xFF
+    private struct InstanceData {
+        let squareInfo: [SquareInfo]
+        
+        init() {
+            var squareInfo: [SquareInfo] = []
+            for i in 0...63 {
+                squareInfo.append(SquareInfo(square: i))
+            }
+            
+            self.squareInfo = squareInfo
+        }
+    }
     
-    init(square: Int) {
+    static subscript(index: Int) -> SquareInfo {
+        get { 
+            return instanceData.squareInfo[index]
+        }
+    }
+    
+    private init(square: Int) {
         let x = square % 8
         let y = square / 8
         north = SquareInfo.getSlidingMoves(x: x, y: y, dx: 0, dy: 1)
@@ -86,7 +105,7 @@ struct SquareInfo {
     
     
     private static func getKingMoves(x: Int, y: Int) -> Int64 {
-        var result: Int64 = 0xFF
+        var result: Int64 = sentinel
         addIfValid(&result, x + 1, y + 1)
         addIfValid(&result, x + 1, y - 1)
         addIfValid(&result, x - 1, y + 1)
@@ -110,9 +129,22 @@ struct SquareInfo {
         
     }
     
-    static func foreach(squareSet: Int64, callback: (Int) -> Bool) {
-        var squareSet = squareSet
-        while true {
+    private static func reverse(_ squareSet: Int64) -> Int64 {
+        var result = sentinel
+        squareSet.foreach() {
+            result <<= 8
+            result += Int64($0)
+            return true
+        }
+        
+        return result
+    }
+}
+
+extension Int64 {
+    func foreach(callback: (Int) -> Bool) {
+        var squareSet = self
+        for _ in 0...7 {
             let square = squareSet & 0xFF
             if square == sentinel {
                 return
@@ -124,16 +156,5 @@ struct SquareInfo {
             
             squareSet >>= 8
         }
-    }
-    
-    private static func reverse(_ squareSet: Int64) -> Int64 {
-        var result = sentinel
-        foreach(squareSet: squareSet) {
-            result <<= 8
-            result += Int64($0)
-            return true
-        }
-        
-        return result
     }
 }

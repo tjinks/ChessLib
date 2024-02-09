@@ -9,8 +9,33 @@ import Foundation
 
 public class Notation {
     public static let initialPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+    private static let fileChars:[Character] = ["a", "b", "c", "d", "e", "f", "g", "h"]
+    private static let rankChars:[Character] = ["1", "2", "3", "4", "5", "6", "7", "8"]
     
-    public static func parseFen(fen: String) throws -> PositionDto {
+    public static func getSquareName(_ square: Dto.Square) -> String {
+        let fileChar = fileChars[square.file]
+        let rankChar = rankChars[square.rank]
+        return String(fileChar) + String(rankChar)
+    }
+    
+    public static func parseSquareName(name: String) throws -> Dto.Square {
+        if name.count != 2 {
+            throw ChessError.invalidSquare
+        }
+        
+        let fileChar = name[name.startIndex]
+        let rankChar = name[name.index(after: name.startIndex)]
+        if let file = fileChars.firstIndex(of: fileChar) {
+            if let rank = rankChars.firstIndex(of: rankChar) {
+                return try Dto.Square(file: file, rank: rank)
+            }
+        }
+
+        throw ChessError.invalidSquare
+    }
+    
+    public static func parseFen(fen: String) throws -> Dto.Position {
         let boardIndex = 0
         let playerIndex = 1
         let castlingRightsIndex = 2
@@ -20,7 +45,12 @@ public class Notation {
         
         var rank: Int = 7
         var file: Int = 0
-        let positionDto = PositionDto()
+        var pieces:Dictionary<Dto.Square, Dto.Piece> = [:]
+        var playerToMove = Dto.Player.white
+        var castlingRights: Dto.CastlingRights = []
+        var epSquare: Dto.Square? = nil
+        var halfMoveClock = 100
+        var fullMove = 0
         
         let parts = split()
         if parts.count < playerIndex + 1 {
@@ -45,7 +75,12 @@ public class Notation {
             try parseFullMove(parts[fullMoveIndex])
         }
         
-        return positionDto
+        return Dto.Position(pieces: pieces,
+                            playerToMove: playerToMove,
+                            castlingRights: castlingRights,
+                            epSquare: epSquare,
+                            halfMoveClock: halfMoveClock,
+                            fullMove: fullMove)
         
         func split() -> [String] {
             var result: [String] = []
@@ -75,10 +110,10 @@ public class Notation {
         func parsePlayer(_ s: String) throws {
             switch (s) {
             case "w":
-                positionDto.activePlayer = .white
+                playerToMove = .white
                 return
             case "b":
-                positionDto.activePlayer = .black
+                playerToMove = .black
                 return
             default:
                 throw ChessError.invalidFen
@@ -92,10 +127,10 @@ public class Notation {
             
             for c in s {
                 switch (c) {
-                case "K": positionDto.castlingRights.insert(.whiteK)
-                case "k": positionDto.castlingRights.insert(.blackK)
-                case "Q": positionDto.castlingRights.insert(.whiteQ)
-                case "q": positionDto.castlingRights.insert(.blackQ)
+                case "K": castlingRights.insert(.whiteKingside)
+                case "k": castlingRights.insert(.blackKingside)
+                case "Q": castlingRights.insert(.whiteQueenside)
+                case "q": castlingRights.insert(.blackQueenside)
                 default: throw ChessError.invalidFen
                 }
             }
@@ -107,7 +142,7 @@ public class Notation {
             }
             
             do {
-                positionDto.epSquare = try Square.get(s)
+                epSquare = try Dto.Square(name: s)
             } catch ChessError.invalidSquare {
                 throw ChessError.invalidFen
             }
@@ -118,7 +153,7 @@ public class Notation {
                 throw ChessError.invalidFen
             }
             
-            positionDto.halfMoveClock = result
+            halfMoveClock = result
         }
         
         func parseFullMove(_ s: String) throws {
@@ -126,7 +161,7 @@ public class Notation {
                 throw ChessError.invalidFen
             }
             
-            positionDto.fullMove = result
+            fullMove = result
         }
         
         func addPiece(_ c: Character) throws -> Bool {
@@ -135,8 +170,8 @@ public class Notation {
             }
             
             do {
-                let square = try Square.get(file: file, rank: rank)
-                positionDto.pieces[square] = piece
+                let square = try Dto.Square(file: file, rank: rank)
+                pieces[square] = piece
                 file += 1
                 
                 return true
@@ -166,20 +201,20 @@ public class Notation {
         }
     }
     
-    private static func charToPiece(_ c: Character) -> Piece? {
+    private static func charToPiece(_ c: Character) -> Dto.Piece? {
         switch (c) {
-        case "K": return .whiteKing
-        case "k": return .blackKing
-        case "Q": return .whiteQueen
-        case "q": return .blackQueen
-        case "R": return .whiteRook
-        case "r": return .blackRook
-        case "B": return .whiteBishop
-        case "b": return .blackBishop
-        case "N": return .whiteKnight
-        case "n": return .blackKnight
-        case "P": return .whitePawn
-        case "p": return .blackPawn
+        case "K": return .king(owner: .white)
+        case "k": return .king(owner: .black)
+        case "Q": return .queen(owner: .white)
+        case "q": return .queen(owner: .black)
+        case "R": return .rook(owner: .white)
+        case "r": return .rook(owner: .black)
+        case "B": return .bishop(owner: .white)
+        case "b": return .bishop(owner: .black)
+        case "N": return .knight(owner: .white)
+        case "n": return .knight(owner: .black)
+        case "P": return .pawn(owner: .white)
+        case "p": return .pawn(owner: .black)
         default: return nil
         }
     }
