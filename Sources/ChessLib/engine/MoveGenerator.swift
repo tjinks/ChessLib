@@ -7,6 +7,7 @@
 
 import Foundation
 
+/*
 extension Position {
     func generateMoves(player: Player) -> [Move] {
         for squareNum in 0...63 {
@@ -14,10 +15,11 @@ extension Position {
             if piece.owner != player {
                 continue
             }
+            var result:[Move] = []
             
             switch piece.type {
             case .king:
-                break
+                result.append(contentsOf: getKingMoves(from: squareNum))
             case .queen:
                 break
             case .rook:
@@ -35,4 +37,9 @@ extension Position {
         
         return []
     }
+    
+    private func getKingMoves(from: Int) {
+        return []
+    }
 }
+*/

@@ -77,6 +77,7 @@ struct SquareInfo {
         if (dy == 1 && y == 1) || (dy == -1 && y == 6) {
             addIfValid(&result, x, y + 2 * dy)
         }
+        
         addIfValid(&result, x, y + dy)
 
         return result
