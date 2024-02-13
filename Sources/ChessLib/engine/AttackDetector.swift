@@ -9,51 +9,53 @@ import Foundation
 
 extension Position {
     func isInCheck(player: Player) -> Bool {
-        let kingSquare = self.kingSquare[player.index]
-        let kingSquareInfo = SquareInfo[kingSquare]
-        let opponent = player.other
+        return isAttacked(square: kingSquare[player.index], by: player.other)
+    }
+    
+    func isAttacked(square: Int, by player: Player) -> Bool {
+        let squareInfo = SquareInfo[square]
         
-        if checkForNonSlidingAttack(from: kingSquareInfo.pawnCaptures[player.index], by: Piece(opponent, .pawn)) {
+        if checkForNonSlidingAttack(from: squareInfo.pawnCaptures[player.other.index], by: Piece(player, .pawn)) {
             return true
         }
         
-        if checkForNonSlidingAttack(from: kingSquareInfo.knightMoves, by: Piece(opponent, .knight)) {
+        if checkForNonSlidingAttack(from: squareInfo.knightMoves, by: Piece(player, .knight)) {
             return true
         }
 
-        if checkForNonSlidingAttack(from: kingSquareInfo.kingMoves, by: Piece(opponent, .king)) {
+        if checkForNonSlidingAttack(from: squareInfo.kingMoves, by: Piece(player, .king)) {
             return true
         }
 
-        if checkForSlidingAttack(from: kingSquareInfo.nw, by: bishopOrQueen) {
+        if checkForSlidingAttack(from: squareInfo.nw, by: bishopOrQueen) {
             return true
         }
         
-        if checkForSlidingAttack(from: kingSquareInfo.ne, by: bishopOrQueen) {
+        if checkForSlidingAttack(from: squareInfo.ne, by: bishopOrQueen) {
             return true
         }
         
-        if checkForSlidingAttack(from: kingSquareInfo.sw, by: bishopOrQueen) {
+        if checkForSlidingAttack(from: squareInfo.sw, by: bishopOrQueen) {
             return true
         }
         
-        if checkForSlidingAttack(from: kingSquareInfo.se, by: bishopOrQueen) {
+        if checkForSlidingAttack(from: squareInfo.se, by: bishopOrQueen) {
             return true
         }
         
-        if checkForSlidingAttack(from: kingSquareInfo.north, by: rookOrQueen) {
+        if checkForSlidingAttack(from: squareInfo.north, by: rookOrQueen) {
             return true
         }
         
-        if checkForSlidingAttack(from: kingSquareInfo.south, by: rookOrQueen) {
+        if checkForSlidingAttack(from: squareInfo.south, by: rookOrQueen) {
             return true
         }
         
-        if checkForSlidingAttack(from: kingSquareInfo.east, by: rookOrQueen) {
+        if checkForSlidingAttack(from: squareInfo.east, by: rookOrQueen) {
             return true
         }
         
-        if checkForSlidingAttack(from: kingSquareInfo.west, by: rookOrQueen) {
+        if checkForSlidingAttack(from: squareInfo.west, by: rookOrQueen) {
             return true
         }
         
@@ -71,10 +73,10 @@ extension Position {
             var result = false
             from.foreach() {
                 let piece = self.board[$0]
-                if piece.owner == opponent {
+                if piece.owner == player {
                     result = by(piece.type)
                     return false
-                } else if piece.owner == player {
+                } else if piece.owner == player.other {
                     result = false
                     return false
                 }
