@@ -120,7 +120,7 @@ struct MoveGenerator {
                 return false
             }
             
-            moveList.add(move: Move(from: from, to: $0, piece: position.board[from], isCapture: false), score: 0.0)
+            addPawnMove(from: from, to: $0, isCapture: false)
             return true
         }
     }
@@ -128,13 +128,27 @@ struct MoveGenerator {
     private func addPawnCaptures(from: Int) {
         SquareInfo[from].pawnCaptures[player.index].foreach() {
             if position.board[$0].owner == opponent {
-                moveList.add(move: Move(from: from, to: $0, piece: position.board[from], isCapture: true), score: 1.0)
+                addPawnMove(from: from, to: $0, isCapture: true)
             } else if $0 == position.epSquare {
                 let move = Move(from: from, epSquare: $0)
                 moveList.add(move: move, score: 1.0)
             }
             
             return true
+        }
+    }
+    
+    private func addPawnMove(from: Int, to: Int, isCapture: Bool) {
+        let isPromotion = (to >= 56 && player == .white) || (to < 8 && player == .black)
+        if isPromotion {
+            let options = [Piece(player, .queen), Piece(player, .rook), Piece(player, .bishop), Piece(player, .knight)]
+            for p in options {
+                let move = Move(from: from, to: to, piece: p, isCapture: isCapture, isPromotion: true)
+                moveList.add(move: move, score: 1.0)
+            }
+        } else {
+            let score = isCapture ? 1.0 : 0.0
+            moveList.add(move: Move(from: from, to: to, piece: Piece(player, .pawn), isCapture: isCapture), score: score)
         }
     }
     

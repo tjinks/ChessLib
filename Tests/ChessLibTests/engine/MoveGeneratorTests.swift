@@ -20,8 +20,12 @@ extension [Move] {
         return result
     }
     
-    func contains(to: Int, isCapture: Bool = false) -> Bool {
+    func containsMove(to: Int, isCapture: Bool = false, promoteTo: Piece? = nil) -> Bool {
         for m in self {
+            if promoteTo != nil && m.piece != promoteTo {
+                continue
+            }
+            
             if m.to == to {
                 return m.isCapture == isCapture
             }
@@ -65,15 +69,15 @@ final class MoveGeneratorTests: XCTestCase {
     func testRookMoves() throws {
         let result = getMoves("8/8/3kr3/8/8/8/2K1R3/8 w -").startingFrom(e2)
         XCTAssertEqual(9, result.count)
-        XCTAssertTrue(result.contains(to: e3))
-        XCTAssertTrue(result.contains(to: e4))
-        XCTAssertTrue(result.contains(to: e5))
-        XCTAssertTrue(result.contains(to: e6, isCapture: true))
-        XCTAssertTrue(result.contains(to: d2))
-        XCTAssertTrue(result.contains(to: f2))
-        XCTAssertTrue(result.contains(to: g2))
-        XCTAssertTrue(result.contains(to: h2))
-        XCTAssertTrue(result.contains(to: e1))
+        XCTAssertTrue(result.containsMove(to: e3))
+        XCTAssertTrue(result.containsMove(to: e4))
+        XCTAssertTrue(result.containsMove(to: e5))
+        XCTAssertTrue(result.containsMove(to: e6, isCapture: true))
+        XCTAssertTrue(result.containsMove(to: d2))
+        XCTAssertTrue(result.containsMove(to: f2))
+        XCTAssertTrue(result.containsMove(to: g2))
+        XCTAssertTrue(result.containsMove(to: h2))
+        XCTAssertTrue(result.containsMove(to: e1))
         
         for m in result {
             XCTAssertEqual(Piece(.white, .rook), m.piece)
@@ -83,13 +87,13 @@ final class MoveGeneratorTests: XCTestCase {
     func testBishopMoves() throws {
         let result = getMoves("8/4k3/4b3/8/2B5/4K3/4R3/8 w -").startingFrom(c4)
         XCTAssertEqual(7, result.count)
-        XCTAssertTrue(result.contains(to: b5))
-        XCTAssertTrue(result.contains(to: a6))
-        XCTAssertTrue(result.contains(to: d5))
-        XCTAssertTrue(result.contains(to: e6, isCapture: true))
-        XCTAssertTrue(result.contains(to: b3))
-        XCTAssertTrue(result.contains(to: a2))
-        XCTAssertTrue(result.contains(to: d3))
+        XCTAssertTrue(result.containsMove(to: b5))
+        XCTAssertTrue(result.containsMove(to: a6))
+        XCTAssertTrue(result.containsMove(to: d5))
+        XCTAssertTrue(result.containsMove(to: e6, isCapture: true))
+        XCTAssertTrue(result.containsMove(to: b3))
+        XCTAssertTrue(result.containsMove(to: a2))
+        XCTAssertTrue(result.containsMove(to: d3))
         
         for m in result {
             XCTAssertEqual(Piece(.white, .bishop), m.piece)
@@ -99,20 +103,20 @@ final class MoveGeneratorTests: XCTestCase {
     func testQueenMoves() throws {
         let result = getMoves("8/4k3/4b3/2r5/2Q1B3/4K3/4R3/8 w -").startingFrom(c4)
         XCTAssertEqual(14, result.count)
-        XCTAssertTrue(result.contains(to: c5, isCapture: true))
-        XCTAssertTrue(result.contains(to: d5))
-        XCTAssertTrue(result.contains(to: e6, isCapture: true))
-        XCTAssertTrue(result.contains(to: d4))
-        XCTAssertTrue(result.contains(to: d3))
-        XCTAssertTrue(result.contains(to: c3))
-        XCTAssertTrue(result.contains(to: c2))
-        XCTAssertTrue(result.contains(to: c1))
-        XCTAssertTrue(result.contains(to: b3))
-        XCTAssertTrue(result.contains(to: a2))
-        XCTAssertTrue(result.contains(to: b4))
-        XCTAssertTrue(result.contains(to: a4))
-        XCTAssertTrue(result.contains(to: b5))
-        XCTAssertTrue(result.contains(to: a6))
+        XCTAssertTrue(result.containsMove(to: c5, isCapture: true))
+        XCTAssertTrue(result.containsMove(to: d5))
+        XCTAssertTrue(result.containsMove(to: e6, isCapture: true))
+        XCTAssertTrue(result.containsMove(to: d4))
+        XCTAssertTrue(result.containsMove(to: d3))
+        XCTAssertTrue(result.containsMove(to: c3))
+        XCTAssertTrue(result.containsMove(to: c2))
+        XCTAssertTrue(result.containsMove(to: c1))
+        XCTAssertTrue(result.containsMove(to: b3))
+        XCTAssertTrue(result.containsMove(to: a2))
+        XCTAssertTrue(result.containsMove(to: b4))
+        XCTAssertTrue(result.containsMove(to: a4))
+        XCTAssertTrue(result.containsMove(to: b5))
+        XCTAssertTrue(result.containsMove(to: a6))
         
         for m in result {
             XCTAssertEqual(Piece(.white, .queen), m.piece)
@@ -122,13 +126,13 @@ final class MoveGeneratorTests: XCTestCase {
     func testKnightMoves() throws {
         let result = getMoves("8/4k3/1r6/8/2N5/4K3/8/8 w -").startingFrom(c4)
         XCTAssertEqual(7, result.count)
-        XCTAssertTrue(result.contains(to: b6, isCapture: true))
-        XCTAssertTrue(result.contains(to: d6))
-        XCTAssertTrue(result.contains(to: e5))
-        XCTAssertTrue(result.contains(to: d2))
-        XCTAssertTrue(result.contains(to: b2))
-        XCTAssertTrue(result.contains(to: a3))
-        XCTAssertTrue(result.contains(to: a5))
+        XCTAssertTrue(result.containsMove(to: b6, isCapture: true))
+        XCTAssertTrue(result.containsMove(to: d6))
+        XCTAssertTrue(result.containsMove(to: e5))
+        XCTAssertTrue(result.containsMove(to: d2))
+        XCTAssertTrue(result.containsMove(to: b2))
+        XCTAssertTrue(result.containsMove(to: a3))
+        XCTAssertTrue(result.containsMove(to: a5))
         
         for m in result {
             XCTAssertEqual(Piece(.white, .knight), m.piece)
@@ -138,14 +142,14 @@ final class MoveGeneratorTests: XCTestCase {
     func testKingMoves() throws {
         let result = getMoves("8/8/4k3/8/8/4K3/3p4/8 w -").startingFrom(e3)
         XCTAssertEqual(8, result.count)
-        XCTAssertTrue(result.contains(to: e4))
-        XCTAssertTrue(result.contains(to: f4))
-        XCTAssertTrue(result.contains(to: f3))
-        XCTAssertTrue(result.contains(to: f2))
-        XCTAssertTrue(result.contains(to: e2))
-        XCTAssertTrue(result.contains(to: d2, isCapture: true))
-        XCTAssertTrue(result.contains(to: d3))
-        XCTAssertTrue(result.contains(to: d4))
+        XCTAssertTrue(result.containsMove(to: e4))
+        XCTAssertTrue(result.containsMove(to: f4))
+        XCTAssertTrue(result.containsMove(to: f3))
+        XCTAssertTrue(result.containsMove(to: f2))
+        XCTAssertTrue(result.containsMove(to: e2))
+        XCTAssertTrue(result.containsMove(to: d2, isCapture: true))
+        XCTAssertTrue(result.containsMove(to: d3))
+        XCTAssertTrue(result.containsMove(to: d4))
 
         for m in result {
             XCTAssertEqual(Piece(.white, .king), m.piece)
@@ -159,25 +163,25 @@ final class MoveGeneratorTests: XCTestCase {
         
         result = all.startingFrom(c2)
         XCTAssertEqual(1, result.count)
-        XCTAssertTrue(result.contains(to: c3))
+        XCTAssertTrue(result.containsMove(to: c3))
         
         result = all.startingFrom(e2)
         XCTAssertEqual(2, result.count)
-        XCTAssertTrue(result.contains(to: e3))
-        XCTAssertTrue(result.contains(to: e4))
+        XCTAssertTrue(result.containsMove(to: e3))
+        XCTAssertTrue(result.containsMove(to: e4))
         
         result = all.startingFrom(f3)
         XCTAssertEqual(1, result.count)
-        XCTAssertTrue(result.contains(to: f4))
+        XCTAssertTrue(result.containsMove(to: f4))
         XCTAssertEqual(Piece(.white, .pawn), result[0].piece)
     }
 
     func testPawnCaptures() throws {
         let result = getMoves("4k3/8/8/8/2p5/1P1P4/8/4K3 b -").startingFrom(c4)
         XCTAssertEqual(3, result.count)
-        XCTAssertTrue(result.contains(to: b3, isCapture: true))
-        XCTAssertTrue(result.contains(to: c3))
-        XCTAssertTrue(result.contains(to: d3, isCapture: true))
+        XCTAssertTrue(result.containsMove(to: b3, isCapture: true))
+        XCTAssertTrue(result.containsMove(to: c3))
+        XCTAssertTrue(result.containsMove(to: d3, isCapture: true))
 
         for m in result {
             XCTAssertEqual(Piece(.black, .pawn), m.piece)
@@ -187,8 +191,8 @@ final class MoveGeneratorTests: XCTestCase {
     func testEpCapture() throws {
         let result = getMoves("4k3/8/8/8/2pP4/8/8/4K3 b - d3").startingFrom(c4)
         XCTAssertEqual(2, result.count)
-        XCTAssertTrue(result.contains(to: c3))
-        XCTAssertTrue(result.contains(to: d3, isCapture: true))
+        XCTAssertTrue(result.containsMove(to: c3))
+        XCTAssertTrue(result.containsMove(to: d3, isCapture: true))
 
         for m in result {
             XCTAssertEqual(Piece(.black, .pawn), m.piece)
@@ -198,6 +202,34 @@ final class MoveGeneratorTests: XCTestCase {
         }
     }
     
+    func testWhitePromotion() throws {
+        let result = getMoves("1q2k3/2P5/8/8/8/8/8/4K3 w - -").startingFrom(c7)
+        XCTAssertEqual(8, result.count)
+        XCTAssertTrue(result.containsMove(to: b8, isCapture: true, promoteTo: Piece(.white, .queen)))
+        XCTAssertTrue(result.containsMove(to: b8, isCapture: true, promoteTo: Piece(.white, .rook)))
+        XCTAssertTrue(result.containsMove(to: b8, isCapture: true, promoteTo: Piece(.white, .bishop)))
+        XCTAssertTrue(result.containsMove(to: b8, isCapture: true, promoteTo: Piece(.white, .knight)))
+
+        XCTAssertTrue(result.containsMove(to: c8, isCapture: false, promoteTo: Piece(.white, .queen)))
+        XCTAssertTrue(result.containsMove(to: c8, isCapture: false, promoteTo: Piece(.white, .rook)))
+        XCTAssertTrue(result.containsMove(to: c8, isCapture: false, promoteTo: Piece(.white, .bishop)))
+        XCTAssertTrue(result.containsMove(to: c8, isCapture: false, promoteTo: Piece(.white, .knight)))
+    }
+    
+    func testBlackPromotion() throws {
+        let result = getMoves("4k3/8/8/8/8/8/2p5/1R2K3 b - -").startingFrom(c2)
+        XCTAssertEqual(8, result.count)
+        XCTAssertTrue(result.containsMove(to: b1, isCapture: true, promoteTo: Piece(.black, .queen)))
+        XCTAssertTrue(result.containsMove(to: b1, isCapture: true, promoteTo: Piece(.black, .rook)))
+        XCTAssertTrue(result.containsMove(to: b1, isCapture: true, promoteTo: Piece(.black, .bishop)))
+        XCTAssertTrue(result.containsMove(to: b1, isCapture: true, promoteTo: Piece(.black, .knight)))
+
+        XCTAssertTrue(result.containsMove(to: c1, isCapture: false, promoteTo: Piece(.black, .queen)))
+        XCTAssertTrue(result.containsMove(to: c1, isCapture: false, promoteTo: Piece(.black, .rook)))
+        XCTAssertTrue(result.containsMove(to: c1, isCapture: false, promoteTo: Piece(.black, .bishop)))
+        XCTAssertTrue(result.containsMove(to: c1, isCapture: false, promoteTo: Piece(.black, .knight)))
+    }
+
     func testWhiteCastlingRights() {
         var result = getMoves("r3k2r/8/8/8/8/8/8/R3K2R w kq")
         XCTAssertFalse(result.containsCastling(whiteKingside))
@@ -248,7 +280,11 @@ final class MoveGeneratorTests: XCTestCase {
         XCTAssertTrue(result.containsCastling(whiteQueenside))
     }
     
-    
+    func testCastlingPreventedByOpponent() {
+        let result = getMoves("r3k2r/8/8/8/2q5/8/8/R3K2R w KQ")
+        XCTAssertFalse(result.containsCastling(whiteKingside))
+        XCTAssertFalse(result.containsCastling(whiteQueenside))
+    }
     
     private func getMoves(_ fen: String) -> [Move] {
         let positionDto = try! Notation.parseFen(fen: fen)
