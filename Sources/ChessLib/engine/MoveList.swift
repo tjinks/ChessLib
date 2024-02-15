@@ -14,11 +14,9 @@ struct MoveListItem {
 
 class MoveList {
     private var items: [MoveListItem]
-    private let alreadySorted: Bool
     
     init() {
         items = []
-        alreadySorted = false
     }
     
     func add(move: Move, score: Double) {

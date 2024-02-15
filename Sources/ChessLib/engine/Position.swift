@@ -75,13 +75,14 @@ let f7 = 53
 let g7 = 54
 let h7 = 55
 
-let a8 = a1 + 56
-let c8 = c1 + 56
-let d8 = d1 + 56
-let e8 = e1 + 56
-let f8 = f1 + 56
-let g8 = g1 + 56
-let h8 = h1 + 56
+let a8 = 56
+let b8 = 57
+let c8 = 58
+let d8 = 59
+let e8 = 60
+let f8 = 61
+let g8 = 62
+let h8 = 63
 
 struct Position: Equatable, Hashable {
     

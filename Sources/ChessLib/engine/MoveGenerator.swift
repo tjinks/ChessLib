@@ -14,7 +14,11 @@ struct MoveGenerator {
     private let player: Player
     private let opponent: Player
     
-    init(position: Position, player: Player) {
+    static func run(position: Position, player: Player) -> MoveList {
+        MoveGenerator(position: position, player: player).moveList
+    }
+    
+    private init(position: Position, player: Player) {
         self.position = position
         self.player = player
         opponent = player.other
@@ -25,13 +29,13 @@ struct MoveGenerator {
                 addMoves(from: from)
             }
         }
+        
+        if position.castlingRights != 0 {
+            addCastlingMoves()
+        }
     }
     
-    var moves: MoveList {
-        return moveList
-    }
-    
-    func addMoves(from: Int) {
+    private func addMoves(from: Int) {
         switch (position.board[from].type) {
         case .king:
             addKingMoves(from: from)
@@ -44,25 +48,28 @@ struct MoveGenerator {
         case .knight:
             addKnightMoves(from: from)
         case .pawn:
-            break
+            addPawnMoves(from: from)
+            addPawnCaptures(from: from)
         case .none:
             break
         }
     }
     
-    func addKingMoves(from: Int) {
+    private func addKingMoves(from: Int) {
         SquareInfo[from].kingMoves.foreach() {
             addIfPossible(from: from, to: $0)
+            return true
         }
     }
     
-    func addKnightMoves(from: Int) {
+    private func addKnightMoves(from: Int) {
         SquareInfo[from].knightMoves.foreach() {
             addIfPossible(from: from, to: $0)
+            return true
         }
     }
     
-    func addBishopMoves(from: Int) {
+    private func addBishopMoves(from: Int) {
         let squareInfo = SquareInfo[from]
 
         squareInfo.ne.foreach() {
@@ -81,7 +88,7 @@ struct MoveGenerator {
         }
     }
     
-    func addRookMoves(from: Int) {
+    private func addRookMoves(from: Int) {
         let squareInfo = SquareInfo[from]
 
         squareInfo.north.foreach() {
@@ -101,20 +108,74 @@ struct MoveGenerator {
         }
     }
     
-    func addQueenMoves(from: Int) {
+    private func addQueenMoves(from: Int) {
         addRookMoves(from: from)
         addBishopMoves(from: from)
     }
     
-    @discardableResult func addIfPossible(from: Int, to: Int) -> Bool {
+    private func addPawnMoves(from: Int) {
+        let squareInfo = SquareInfo[from]
+        squareInfo.pawnMoves[player.index].foreach() {
+            if position.board[$0].owner != nil {
+                return false
+            }
+            
+            moveList.add(move: Move(from: from, to: $0, piece: position.board[from], isCapture: false), score: 0.0)
+            return true
+        }
+    }
+    
+    private func addPawnCaptures(from: Int) {
+        SquareInfo[from].pawnCaptures[player.index].foreach() {
+            if position.board[$0].owner == opponent {
+                moveList.add(move: Move(from: from, to: $0, piece: position.board[from], isCapture: true), score: 1.0)
+            } else if $0 == position.epSquare {
+                let move = Move(from: from, epSquare: $0)
+                moveList.add(move: move, score: 1.0)
+            }
+            
+            return true
+        }
+    }
+    
+    private func addCastlingMoves() {
+        switch player {
+        case .white:
+            tryAdd(castlingType: whiteKingside, intermediateSquares: [f1, g1])
+            tryAdd(castlingType: whiteQueenside, intermediateSquares: [d1, c1, b1])
+        case .black:
+            tryAdd(castlingType: blackKingside, intermediateSquares: [f8, g8])
+            tryAdd(castlingType: blackQueenside, intermediateSquares: [d8, c8, b8])
+        }
+        
+        func tryAdd(castlingType: Int8, intermediateSquares: [Int]) {
+            if (position.castlingRights & castlingType) == 0 {
+                return
+            }
+            
+            for i in intermediateSquares {
+                if position.board[i] != Piece.none {
+                    return
+                }
+            }
+            
+            if position.isAttacked(square: intermediateSquares[0], by: opponent) {
+                return
+            }
+            
+            moveList.add(move: Move(castles: castlingType), score: 0.5)
+        }
+    }
+    
+    @discardableResult private func addIfPossible(from: Int, to: Int) -> Bool {
         let piece = position.board[to]
         if piece.owner == player {
             return false
         } else if piece.owner == opponent {
-            moveList.add(move: Move(from: from, to: to, piece: piece, isCapture: true), score: 1.0)
+            moveList.add(move: Move(from: from, to: to, piece: position.board[from], isCapture: true), score: 1.0)
             return false
         } else {
-            moveList.add(move: Move(from: from, to: to, piece: piece, isCapture: false), score: 0.0)
+            moveList.add(move: Move(from: from, to: to, piece: position.board[from], isCapture: false), score: 0.0)
             return true
         }
     }
