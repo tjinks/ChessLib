@@ -13,7 +13,7 @@ public enum Dto {
         case white, black
     }
     
-    public enum Piece: Equatable {
+    public enum Piece: Equatable, Hashable {
         case none
         case king(owner: Player)
         case queen(owner: Player)
@@ -28,6 +28,10 @@ public enum Dto {
         case whiteQueenside
         case blackKingside
         case blackQueenside
+    }
+    
+    public enum Result {
+        case none, whiteWin, blackWin, draw
     }
     
     public typealias CastlingRights = Set<CastlingOption>

@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+public enum Player: Int8 {
+    case white = 0
+    case black = 1
+}
+

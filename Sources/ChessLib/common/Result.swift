@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+public enum Result {
+    case none, draw, whiteWin, blackWin
+}

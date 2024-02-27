@@ -7,11 +7,6 @@
 
 import Foundation
 
-enum Player: Int8 {
-    case white = 0
-    case black = 1
-}
-
 extension Player {
     var other: Player {
         switch self {

@@ -15,5 +15,6 @@ typealias PieceType = ChessLib.PieceType
 typealias Notation = ChessLib.Notation
 typealias GameState = ChessLib.GameState
 typealias MoveGenerator = ChessLib.MoveGenerator
+typealias MateCheckResult = ChessLib.MateCheckResult
 
 
