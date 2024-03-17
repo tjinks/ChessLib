@@ -9,10 +9,6 @@ import Foundation
 
 public enum Dto {
 
-    public enum Player {
-        case white, black
-    }
-    
     public enum Piece: Equatable, Hashable {
         case none
         case king(owner: Player)

@@ -54,32 +54,25 @@ struct Piece: Equatable, Hashable {
         switch (piece) {
         case .king(let owner):
             type = .king
-            self.owner = Piece.convert(owner)
+            self.owner = owner
         case .queen(let owner):
             type = .queen
-            self.owner = Piece.convert(owner)
+            self.owner = owner
         case .rook(let owner):
             type = .rook
-            self.owner = Piece.convert(owner)
+            self.owner = owner
         case .bishop(let owner):
             type = .bishop
-            self.owner = Piece.convert(owner)
+            self.owner = owner
         case .knight(let owner):
             type = .knight
-            self.owner = Piece.convert(owner)
+            self.owner = owner
         case .pawn(let owner):
             type = .pawn
-            self.owner = Piece.convert(owner)
+            self.owner = owner
         case .none:
             type = .none
             owner = .none
-        }
-    }
-    
-    private static func convert(_ dtoPlayer: Dto.Player) -> Player {
-        switch (dtoPlayer) {
-        case .black: return .black
-        case .white: return .white
         }
     }
 }

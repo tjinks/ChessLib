@@ -46,7 +46,7 @@ public class Notation {
         var rank: Int = 7
         var file: Int = 0
         var pieces:Dictionary<Dto.Square, Dto.Piece> = [:]
-        var playerToMove = Dto.Player.white
+        var playerToMove = Player.white
         var castlingRights: Dto.CastlingRights = []
         var epSquare: Dto.Square? = nil
         var halfMoveClock = 100
