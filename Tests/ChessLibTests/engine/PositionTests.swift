@@ -23,7 +23,7 @@ final class PositionTests: XCTestCase {
     
     private func createPosition(_ fen: String) -> Position {
         let positionDto = try! Notation.parseFen(fen: fen)
-        return try! Position(positionDto: positionDto)
+        return try! Position(dto: positionDto)
     }
     
     func testNormalMove() throws {
@@ -232,7 +232,7 @@ final class PositionTests: XCTestCase {
     func testInitFromDto() throws {
         let fen = "3qk3/r7/1n2b3/2p5/4P3/2B5/3N4/3QK2R w K c6 180 20"
         let dto = try ChessLib.Notation.parseFen(fen: fen)
-        let position = try Position(positionDto: dto)
+        let position = try Position(dto: dto)
         XCTAssertEqual(Player.white, position.playerToMove)
         XCTAssertEqual(whiteKingside, position.castlingRights)
         XCTAssertEqual(42, position.epSquare)
@@ -264,7 +264,7 @@ final class PositionTests: XCTestCase {
             case 60:
                 XCTAssertEqual(Piece(.black, .king), piece)
             default:
-                XCTAssertEqual(Piece(nil, .none), piece)
+                XCTAssertEqual(.none, piece)
             }
         }
     }

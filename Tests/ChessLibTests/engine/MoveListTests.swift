@@ -11,7 +11,7 @@ import XCTest
 final class MoveListTests: XCTestCase {
     func testGetMoves() throws {
         let positionDto = try Notation.parseFen(fen: "8/8/8/K7/8/k1r1R3/8/8 b")
-        let position = try Position(positionDto: positionDto)
+        let position = try Position(dto: positionDto)
         let moveList = MoveList()
         moveList.add(move: Move(from: a3, to: a4, piece: Piece(.black, .king)), score: 1.0)
         moveList.add(move: Move(from: a3, to: b2, piece: Piece(.black, .king)), score: 2.0)
