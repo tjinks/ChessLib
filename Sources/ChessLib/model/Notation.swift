@@ -13,13 +13,13 @@ public class Notation {
     private static let fileChars:[Character] = ["a", "b", "c", "d", "e", "f", "g", "h"]
     private static let rankChars:[Character] = ["1", "2", "3", "4", "5", "6", "7", "8"]
     
-    public static func getSquareName(_ square: Dto.Square) -> String {
+    public static func getSquareName(_ square: Square) -> String {
         let fileChar = fileChars[square.file]
         let rankChar = rankChars[square.rank]
         return String(fileChar) + String(rankChar)
     }
     
-    public static func parseSquareName(name: String) throws -> Dto.Square {
+    public static func parseSquareName(name: String) throws -> Square {
         if name.count != 2 {
             throw ChessError.invalidSquare
         }
@@ -28,14 +28,14 @@ public class Notation {
         let rankChar = name[name.index(after: name.startIndex)]
         if let file = fileChars.firstIndex(of: fileChar) {
             if let rank = rankChars.firstIndex(of: rankChar) {
-                return try Dto.Square(file: file, rank: rank)
+                return try Square(file: file, rank: rank)
             }
         }
 
         throw ChessError.invalidSquare
     }
     
-    public static func parseFen(fen: String) throws -> Dto.Position {
+    public static func parseFen(fen: String) throws -> GameStateDto {
         let boardIndex = 0
         let playerIndex = 1
         let castlingRightsIndex = 2
@@ -45,10 +45,13 @@ public class Notation {
         
         var rank: Int = 7
         var file: Int = 0
-        var pieces:Dictionary<Dto.Square, Dto.Piece> = [:]
+        var pieces:Dictionary<Square, Piece> = [:]
         var playerToMove = Player.white
-        var castlingRights: Dto.CastlingRights = []
-        var epSquare: Dto.Square? = nil
+        var whiteCanCastleShort = false
+        var whiteCanCastleLong = false
+        var blackCanCastleShort = false
+        var blackCanCastleLong = false
+        var epSquare: Square? = nil
         var halfMoveClock = 100
         var fullMove = 0
         
@@ -75,9 +78,20 @@ public class Notation {
             try parseFullMove(parts[fullMoveIndex])
         }
         
-        return Dto.Position(pieces: pieces,
+        var board = [Piece](repeating: Piece.none, count: 64)
+        try! Square.forAll() {
+            if let piece = pieces[$0] {
+                board[$0.number] = piece
+            }
+            return true
+        }
+        
+        return GameStateDto(board: board,
                             playerToMove: playerToMove,
-                            castlingRights: castlingRights,
+                            whiteCanCastleShort: whiteCanCastleShort,
+                            whiteCanCastleLong: whiteCanCastleLong,
+                            blackCanCastleShort: blackCanCastleShort,
+                            blackCanCastleLong: blackCanCastleLong,
                             epSquare: epSquare,
                             halfMoveClock: halfMoveClock,
                             fullMove: fullMove)
@@ -127,10 +141,10 @@ public class Notation {
             
             for c in s {
                 switch (c) {
-                case "K": castlingRights.insert(.whiteKingside)
-                case "k": castlingRights.insert(.blackKingside)
-                case "Q": castlingRights.insert(.whiteQueenside)
-                case "q": castlingRights.insert(.blackQueenside)
+                case "K": whiteCanCastleShort = true
+                case "k": blackCanCastleShort = true
+                case "Q": whiteCanCastleLong = true
+                case "q": blackCanCastleLong = true
                 default: throw ChessError.invalidFen
                 }
             }
@@ -142,7 +156,7 @@ public class Notation {
             }
             
             do {
-                epSquare = try Dto.Square(name: s)
+                epSquare = try Square(name: s)
             } catch ChessError.invalidSquare {
                 throw ChessError.invalidFen
             }
@@ -170,7 +184,7 @@ public class Notation {
             }
             
             do {
-                let square = try Dto.Square(file: file, rank: rank)
+                let square = try Square(file: file, rank: rank)
                 pieces[square] = piece
                 file += 1
                 
@@ -201,20 +215,20 @@ public class Notation {
         }
     }
     
-    private static func charToPiece(_ c: Character) -> Dto.Piece? {
+    private static func charToPiece(_ c: Character) -> Piece? {
         switch (c) {
-        case "K": return .king(owner: .white)
-        case "k": return .king(owner: .black)
-        case "Q": return .queen(owner: .white)
-        case "q": return .queen(owner: .black)
-        case "R": return .rook(owner: .white)
-        case "r": return .rook(owner: .black)
-        case "B": return .bishop(owner: .white)
-        case "b": return .bishop(owner: .black)
-        case "N": return .knight(owner: .white)
-        case "n": return .knight(owner: .black)
-        case "P": return .pawn(owner: .white)
-        case "p": return .pawn(owner: .black)
+        case "K": return .whiteKing
+        case "k": return .blackKing
+        case "Q": return .whiteQueen
+        case "q": return .blackQueen
+        case "R": return .whiteRook
+        case "r": return .blackRook
+        case "B": return .whiteBishop
+        case "b": return .blackBishop
+        case "N": return .whiteKnight
+        case "n": return .blackKnight
+        case "P": return .whitePawn
+        case "p": return .blackPawn
         default: return nil
         }
     }

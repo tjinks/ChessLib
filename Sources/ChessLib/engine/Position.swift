@@ -102,29 +102,30 @@ struct Position: Equatable, Hashable {
     
     init() {
         let dto = try! Notation.parseFen(fen: Notation.initialPosition)
-        try! self.init(positionDto: dto)
+        try! self.init(dto: dto)
     }
     
     init(fen: String) throws {
         let dto = try! Notation.parseFen(fen: fen)
-        try! self.init(positionDto: dto)
+        try! self.init(dto: dto)
     }
     
-    init(positionDto: Dto.Position) throws {
-        var board: [Piece] = []
+    init(dto: GameStateDto) throws {
+        self.board = dto.board
+        
         var kingSquare: [Int?] = [nil, nil]
-        for squareNumber in 0...63 {
-            let piece = Piece(positionDto.getPiece(at: try! Dto.Square(number: squareNumber)))
+        try Square.forAll {
+            let piece = dto.board[$0.number]
             if piece.type == .king {
                 let index = piece.owner!.index
                 if kingSquare[index] != nil {
                     throw ChessError.duplicateKing
                 }
                 
-                kingSquare[index] = squareNumber
+                kingSquare[index] = $0.number
             }
             
-            board.append(piece)
+            return true
         }
         
         if (kingSquare[0] == nil || kingSquare[1] == nil) {
@@ -133,36 +134,29 @@ struct Position: Equatable, Hashable {
         
         self.kingSquare = [kingSquare[0]!, kingSquare[1]!]
         
-        self.board = board
-        
-        switch positionDto.playerToMove {
-        case .white:
-            playerToMove = .white
-        case .black:
-            playerToMove = .black
-        }
+        playerToMove = dto.playerToMove
         
         var castlingRights: Int8 = 0
-        if positionDto.castlingRights.contains(.whiteKingside) {
+        if dto.whiteCanCastleShort {
             castlingRights |= whiteKingside
         }
         
-        if positionDto.castlingRights.contains(.whiteQueenside) {
+        if dto.whiteCanCastleLong {
             castlingRights |= whiteQueenside
         }
         
-        if positionDto.castlingRights.contains(.blackKingside) {
+        if dto.blackCanCastleShort {
             castlingRights |= blackKingside
         }
         
-        if positionDto.castlingRights.contains(.blackQueenside) {
+        if dto.blackCanCastleShort {
             castlingRights |= blackQueenside
         }
         
         self.castlingRights = castlingRights
         
-        if let eps = positionDto.epSquare {
-            epSquare = eps.file + 8 * eps.rank
+        if let eps = dto.epSquare {
+            epSquare = eps.number
         } else {
             epSquare = nil
         }

@@ -20,7 +20,7 @@ extension Player {
     }
 }
 
-enum PieceType: Int8 {
+public enum PieceType: Int8 {
     case none = 0
     case king = 1
     case queen = 2
@@ -28,6 +28,38 @@ enum PieceType: Int8 {
     case bishop = 4
     case knight = 5
     case pawn = 6
+}
+
+public enum Piece: Int8 {
+    case none = 0
+    case whiteKing = 1, blackKing = -1
+    case whiteQueen = 2, blackQueen = -2
+    case whiteRook = 3, blackRook = -3
+    case whiteBishop = 4, blackBishop = -4
+    case whiteKnight = 5, blackKnight = -5
+    case whitePawn = 6, blackPawn = -6
+}
+
+extension Piece {
+    init(_ player: Player, _ type: PieceType) {
+        self.init(rawValue: type.rawValue * (player == .black ? -1 : 1))!
+    }
+    
+    var owner: Player? {
+        get {
+            switch self.rawValue.signum() {
+            case -1: return .black
+            case 1: return .white
+            default: return nil
+            }
+        }
+    }
+    
+    var type: PieceType {
+        get {
+            return PieceType(rawValue: abs(self.rawValue))!
+        }
+    }
 }
 
 extension PieceType {
@@ -40,40 +72,4 @@ extension PieceType {
     }
 }
 
-struct Piece: Equatable, Hashable {
-    static let none = Piece(nil, .none)
-    let owner: Player?
-    let type: PieceType
-    
-    init(_ owner: Player?, _ type: PieceType) {
-        self.owner = owner
-        self.type = type
-    }
-    
-    init(_ piece: Dto.Piece) {
-        switch (piece) {
-        case .king(let owner):
-            type = .king
-            self.owner = owner
-        case .queen(let owner):
-            type = .queen
-            self.owner = owner
-        case .rook(let owner):
-            type = .rook
-            self.owner = owner
-        case .bishop(let owner):
-            type = .bishop
-            self.owner = owner
-        case .knight(let owner):
-            type = .knight
-            self.owner = owner
-        case .pawn(let owner):
-            type = .pawn
-            self.owner = owner
-        case .none:
-            type = .none
-            owner = .none
-        }
-    }
-}
 
