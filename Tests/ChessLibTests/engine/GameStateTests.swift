@@ -19,7 +19,7 @@ final class GameStateTests: XCTestCase {
     func testMakeMove() throws {
         var position = Position()
         var gameState = GameState(initialPosition: position, initialHalfMoveClock: 0, initialFullMove: 1)
-        position = gameState.makeMove(Move(from: g1, to: f3, piece: Piece(.white, .knight)))
+        position = gameState.makeMove(Move(from: g1, to: f3, piece: .whiteKnight))
         XCTAssertEqual(Player.black, position.playerToMove)
         XCTAssert(position == gameState.currentPosition)
     }

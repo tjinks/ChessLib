@@ -287,8 +287,8 @@ final class MoveGeneratorTests: XCTestCase {
     }
     
     private func getMoves(_ fen: String) -> [Move] {
-        let positionDto = try! Notation.parseFen(fen: fen)
-        let position = try! Position(dto: positionDto)
+        let dto = try! Notation.parseFen(fen: fen)
+        let position = try! Position(dto: dto)
         let moveList = MoveGenerator.run(position: position, player: position.playerToMove)
         return moveList.getMoves(position: position)
     }

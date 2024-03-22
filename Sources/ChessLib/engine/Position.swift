@@ -149,7 +149,7 @@ struct Position: Equatable, Hashable {
             castlingRights |= blackKingside
         }
         
-        if dto.blackCanCastleShort {
+        if dto.blackCanCastleLong {
             castlingRights |= blackQueenside
         }
         
