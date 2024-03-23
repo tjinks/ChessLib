@@ -139,7 +139,7 @@ struct MoveGenerator {
     }
     
     private func addPawnMove(from: Int, to: Int, isCapture: Bool) {
-        let isPromotion = (to >= 56 && player == .white) || (to < 8 && player == .black)
+        let isPromotion = (to >= a8 && player == .white) || (to <= h1 && player == .black)
         if isPromotion {
             let options = [Piece(player, .queen), Piece(player, .rook), Piece(player, .bishop), Piece(player, .knight)]
             for p in options {

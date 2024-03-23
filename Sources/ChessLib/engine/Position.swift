@@ -162,48 +162,97 @@ struct Position: Equatable, Hashable {
         }
     }
     
+    subscript(square: Square) -> Piece {
+        return board[square.number]
+    }
+    
     func makeMove(_ move: Move) -> Position {
         var board = self.board
         var kingSquare = self.kingSquare
         
-        board[move.to] = move.piece
-        board[move.from] = Piece.none
-        if move.isEpCapture {
-            board[move.to1!] = Piece.none
-        } else if move.isCastles {
-            board[move.to1!] = board[move.from1!]
-            board[move.from1!] = Piece.none
-        }
-        
-        if move.piece == Piece(.white, .king) {
-            kingSquare[Player.white.index] = move.to
-        } else if move.piece == Piece(.black, .king) {
-            kingSquare[Player.black.index] = move.to
+        switch move {
+        case .castlesLong:
+            if playerToMove == .white {
+                board[a1] = .none
+                board[c1] = .whiteKing
+                board[d1] = .whiteRook
+                board[e1] = .none
+                kingSquare[playerToMove.index] = c1
+            } else {
+                board[a8] = .none
+                board[c8] = .blackKing
+                board[d8] = .blackRook
+                board[e8] = .none
+                kingSquare[playerToMove.index] = c8
+            }
+            
+        case .castlesShort:
+            if playerToMove == .white {
+                board[h1] = .none
+                board[g1] = .whiteKing
+                board[f1] = .whiteRook
+                board[e1] = .none
+                kingSquare[playerToMove.index] = g1
+            } else {
+                board[h8] = .none
+                board[g8] = .blackKing
+                board[f8] = .blackRook
+                board[e8] = .none
+                kingSquare[playerToMove.index] = g8
+            }
+            
+        case .normal(let from, let to, let promoteTo):
+            if let promoteTo = promoteTo {
+                board[to.number] = promoteTo
+            } else {
+                board[to.number] = board[from.number]
+            }
+            
+            board[from.number] = .none
+            if move.isEpCapture(self) {
+                let inc = playerToMove == .white ? -8 : 8
+                board[epSquare! + inc] = .none
+            }
+            
+            switch board[to.number] {
+            case .whiteKing, .blackKing:
+                kingSquare[playerToMove.index] = to.number
+            default:
+                break;
+            }
         }
         
         var castlingRights = self.castlingRights
         if castlingRights != 0 {
             var rightsToRemove: Int8 = 0
-            switch move.from {
-            case e1: rightsToRemove = whiteKingside | whiteQueenside
-            case e8: rightsToRemove = blackKingside | blackQueenside
-            case a1: rightsToRemove = whiteQueenside
-            case a8: rightsToRemove = blackQueenside
-            case h1: rightsToRemove = whiteKingside
-            case h8: rightsToRemove = blackKingside
-            default: break
+            switch move {
+            case .castlesLong, .castlesShort:
+                if playerToMove == .white {
+                    rightsToRemove = whiteKingside | whiteQueenside
+                } else {
+                    rightsToRemove = blackKingside | blackQueenside
+                }
+            case .normal(let from, let to, _):
+                if from.number == e1 {
+                    rightsToRemove = whiteKingside | whiteQueenside
+                } else if from.number == e8 {
+                    rightsToRemove = blackKingside | blackQueenside
+                }
+                if from.number == a1 || to.number == a1 {
+                    rightsToRemove |= whiteQueenside
+                }
+                if from.number == h1 || to.number == h1 {
+                    rightsToRemove |= whiteKingside
+                }
+                if from.number == a8 || to.number == a8 {
+                    rightsToRemove |= blackQueenside
+                }
+                if from.number == h8 || to.number == h8 {
+                    rightsToRemove |= blackKingside
+                }
             }
             
             castlingRights &= ~rightsToRemove
-        }
-        
-        var epSquare: Int? = nil
-        if move.isPawnMove {
-            switch move.to - move.from {
-            case 16: epSquare = move.from + 8
-            case -16: epSquare = move.from - 8
-            default: break
-            }
         }
         
         return Position(
