@@ -28,7 +28,7 @@ final class PositionTests: XCTestCase {
     
     func testNormalMove() throws {
         let initialPosition = createPosition(positionForNormalMoveTest)
-        let move = Move(from: 13, to: 21, piece: Piece(.white, .pawn))
+        let move = Move.normal(from: 13, to: 21, promoteTo: nil)
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {
@@ -49,7 +49,7 @@ final class PositionTests: XCTestCase {
     
     func testEpCapture() throws {
         let initialPosition = createPosition(positionForEpCaptureTest)
-        let move = Move(from: 27, epSquare: 20)
+        let move = Move.normal(from: 27, to: 20, promoteTo: nil)
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {
@@ -70,7 +70,7 @@ final class PositionTests: XCTestCase {
     
     func testPromotion() throws {
         let initialPosition = createPosition(positionForNormalMoveTest)
-        let move = Move(from: 50, to: 58, piece: Piece(.white, .queen))
+        let move = Move.normal(from: c7, to: c8, promoteTo: .whiteQueen)
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {
@@ -91,7 +91,7 @@ final class PositionTests: XCTestCase {
     
     func testSetEpSquare() throws {
         let initialPosition = createPosition(positionForNormalMoveTest)
-        let move = Move(from: 13, to: 29, piece: Piece(.white, .pawn))
+        let move = Move.normal(from: f2, to: f4, promoteTo: nil)
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {
@@ -112,7 +112,7 @@ final class PositionTests: XCTestCase {
     
     func testCastlingWhiteKingside() throws {
         let initialPosition = createPosition(positionForNormalMoveTest)
-        let move = Move(castles: whiteKingside)
+        let move = Move.castlesShort
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {
@@ -137,7 +137,7 @@ final class PositionTests: XCTestCase {
 
     func testCastlingWhiteQueenside() throws {
         let initialPosition = createPosition(positionForNormalMoveTest)
-        let move = Move(castles: whiteQueenside)
+        let move = Move.castlesLong
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {
@@ -162,7 +162,7 @@ final class PositionTests: XCTestCase {
 
     func testCastlingBlackKingside() throws {
         let initialPosition = createPosition(positionForEpCaptureTest)
-        let move = Move(castles: blackKingside)
+        let move = Move.castlesShort
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {
@@ -187,7 +187,7 @@ final class PositionTests: XCTestCase {
 
     func testCastlingBlackQueenside() throws {
         let initialPosition = createPosition(positionForEpCaptureTest)
-        let move = Move(castles: blackQueenside)
+        let move = Move.castlesLong
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {
@@ -212,19 +212,19 @@ final class PositionTests: XCTestCase {
 
     func testRookMoves() {
         var position = createPosition(positionForNormalMoveTest)
-        var move = Move(from: 0, to: 1, piece: Piece(.white, .rook))
+        var move = Move.normal(from: 0, to: 1, promoteTo: nil)
         position = position.makeMove(move)
         XCTAssertEqual(whiteKingside | blackKingside | blackQueenside, position.castlingRights)
         
-        move = Move(from: 56, to: 57, piece: Piece(.black, .rook))
+        move = Move.normal(from: 56, to: 57, promoteTo: nil)
         position = position.makeMove(move)
         XCTAssertEqual(whiteKingside | blackKingside, position.castlingRights)
 
-        move = Move(from: 7, to: 6, piece: Piece(.white, .rook))
+        move = Move.normal(from: 7, to: 6, promoteTo: nil)
         position = position.makeMove(move)
         XCTAssertEqual(blackKingside, position.castlingRights)
 
-        move = Move(from: 63, to: 62, piece: Piece(.black, .rook))
+        move = Move.normal(from: 63, to: 62, promoteTo: nil)
         position = position.makeMove(move)
         XCTAssertEqual(0, position.castlingRights)
     }

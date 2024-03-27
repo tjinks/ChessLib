@@ -120,53 +120,64 @@ struct MoveGenerator {
                 return false
             }
             
-            addPawnMove(from: from, to: $0, isCapture: false)
+            addPawnMove(from: from, to: $0)
             return true
         }
+    }
+    
+    private func addMove(_ move: Move) {
+        let score = move.score(position: position)
+        moveList.add(move: move, score: score)
     }
     
     private func addPawnCaptures(from: Int) {
         SquareInfo[from].pawnCaptures[player.index].foreach() {
             if position.board[$0].owner == opponent {
-                addPawnMove(from: from, to: $0, isCapture: true)
+                addPawnMove(from: from, to: $0)
             } else if $0 == position.epSquare {
-                let move = Move(from: from, epSquare: $0)
-                moveList.add(move: move, score: 1.0)
+                let move = Move.normal(from: from, to: $0, promoteTo: nil)
+                addMove(move)
             }
             
             return true
         }
     }
     
-    private func addPawnMove(from: Int, to: Int, isCapture: Bool) {
+    private func addPawnMove(from: Int, to: Int) {
         let isPromotion = (to >= a8 && player == .white) || (to <= h1 && player == .black)
         if isPromotion {
             let options = [Piece(player, .queen), Piece(player, .rook), Piece(player, .bishop), Piece(player, .knight)]
             for p in options {
-                let move = Move(from: from, to: to, piece: p, isCapture: isCapture, isPromotion: true)
-                moveList.add(move: move, score: 1.0)
+                let move = Move.normal(from: from, to: to, promoteTo: p)
+                addMove(move)
             }
         } else {
-            let score = isCapture ? 1.0 : 0.0
-            moveList.add(move: Move(from: from, to: to, piece: Piece(player, .pawn), isCapture: isCapture), score: score)
+            let move = Move.normal(from: from, to: to, promoteTo: nil)
+            addMove(move)
         }
     }
     
     private func addCastlingMoves() {
         switch player {
         case .white:
-            tryAdd(castlingType: whiteKingside, intermediateSquares: [f1, g1])
-            tryAdd(castlingType: whiteQueenside, intermediateSquares: [d1, c1, b1])
-        case .black:
-            tryAdd(castlingType: blackKingside, intermediateSquares: [f8, g8])
-            tryAdd(castlingType: blackQueenside, intermediateSquares: [d8, c8, b8])
-        }
-        
-        func tryAdd(castlingType: Int8, intermediateSquares: [Int]) {
-            if (position.castlingRights & castlingType) == 0 {
-                return
+            if (position.castlingRights & whiteKingside) != 0 {
+                tryAdd(castlingMove: .castlesShort, intermediateSquares: [f1, g1])
             }
             
+            if (position.castlingRights & whiteQueenside) != 0 {
+                tryAdd(castlingMove: .castlesLong, intermediateSquares: [d1, c1, b1])
+            }
+        case .black:
+            if (position.castlingRights & blackKingside) != 0 {
+                tryAdd(castlingMove: .castlesShort, intermediateSquares: [f8, g8])
+            }
+            
+            if (position.castlingRights & blackQueenside) != 0 {
+                tryAdd(castlingMove: .castlesLong, intermediateSquares: [d8, c8, b8])
+            }
+        }
+        
+        func tryAdd(castlingMove: Move, intermediateSquares: [Int]) {
             for i in intermediateSquares {
                 if position.board[i] != Piece.none {
                     return
@@ -177,7 +188,7 @@ struct MoveGenerator {
                 return
             }
             
-            moveList.add(move: Move(castles: castlingType), score: 0.5)
+            addMove(castlingMove)
         }
     }
     
@@ -186,10 +197,10 @@ struct MoveGenerator {
         if piece.owner == player {
             return false
         } else if piece.owner == opponent {
-            moveList.add(move: Move(from: from, to: to, piece: position.board[from], isCapture: true), score: 1.0)
+            addMove(.normal(from: from, to: to, promoteTo: nil))
             return false
         } else {
-            moveList.add(move: Move(from: from, to: to, piece: position.board[from], isCapture: false), score: 0.0)
+            addMove(.normal(from: from, to: to, promoteTo: nil))
             return true
         }
     }

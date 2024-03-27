@@ -33,7 +33,7 @@ struct GameState {
     
     @discardableResult mutating func makeMove(_ move: Move) -> Position {
         let newPosition = currentPosition.makeMove(move)
-        let restartsClock = move.isCapture || move.isPawnMove
+        let restartsClock = move.isCapture(currentPosition) || move.isPawnMove(currentPosition)
         let halfMoveClock = restartsClock ? 0 : halfMoveClock + 1
         let isRepetionBoundary = restartsClock || newPosition.castlingRights != currentPosition.castlingRights
         let historyItem = HistoryItem(position: newPosition,

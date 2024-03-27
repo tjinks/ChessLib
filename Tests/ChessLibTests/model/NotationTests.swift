@@ -6,7 +6,7 @@
 //
 
 import XCTest
-import ChessLib
+@testable import ChessLib
 
 final class NotationTests: XCTestCase {
     override func setUpWithError() throws {
@@ -83,7 +83,7 @@ final class NotationTests: XCTestCase {
             XCTAssertFalse(result.whiteCanCastleShort)
             XCTAssertFalse(result.blackCanCastleLong)
             XCTAssertFalse(result.blackCanCastleShort)
-            XCTAssertEqual(try Square(name: "e3"), result.epSquare)
+            XCTAssertEqual(e3, result.epSquare)
             XCTAssertEqual(0, result.halfMoveClock)
             XCTAssertEqual(53, result.fullMove)
         }

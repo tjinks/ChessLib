@@ -13,13 +13,13 @@ public class Notation {
     private static let fileChars:[Character] = ["a", "b", "c", "d", "e", "f", "g", "h"]
     private static let rankChars:[Character] = ["1", "2", "3", "4", "5", "6", "7", "8"]
     
-    public static func getSquareName(_ square: Square) -> String {
+    public static func getSquareName(_ square: Int) -> String {
         let fileChar = fileChars[square.file]
         let rankChar = rankChars[square.rank]
         return String(fileChar) + String(rankChar)
     }
     
-    public static func parseSquareName(name: String) throws -> Square {
+    public static func parseSquareName(name: String) throws -> Int {
         if name.count != 2 {
             throw ChessError.invalidSquare
         }
@@ -28,7 +28,7 @@ public class Notation {
         let rankChar = name[name.index(after: name.startIndex)]
         if let file = fileChars.firstIndex(of: fileChar) {
             if let rank = rankChars.firstIndex(of: rankChar) {
-                return try Square(file: file, rank: rank)
+                return try Int(file: file, rank: rank)
             }
         }
 
@@ -45,13 +45,13 @@ public class Notation {
         
         var rank: Int = 7
         var file: Int = 0
-        var pieces:Dictionary<Square, Piece> = [:]
+        var pieces:Dictionary<Int, Piece> = [:]
         var playerToMove = Player.white
         var whiteCanCastleShort = false
         var whiteCanCastleLong = false
         var blackCanCastleShort = false
         var blackCanCastleLong = false
-        var epSquare: Square? = nil
+        var epSquare: Int? = nil
         var halfMoveClock = 100
         var fullMove = 0
         
@@ -79,9 +79,9 @@ public class Notation {
         }
         
         var board = [Piece](repeating: Piece.none, count: 64)
-        try! Square.forAll() {
+        try! forAllSquares() {
             if let piece = pieces[$0] {
-                board[$0.number] = piece
+                board[$0] = piece
             }
             return true
         }
@@ -156,7 +156,7 @@ public class Notation {
             }
             
             do {
-                epSquare = try Square(name: s)
+                epSquare = try Int(name: s)
             } catch ChessError.invalidSquare {
                 throw ChessError.invalidFen
             }
@@ -184,7 +184,7 @@ public class Notation {
             }
             
             do {
-                let square = try Square(file: file, rank: rank)
+                let square = try Int(file: file, rank: rank)
                 pieces[square] = piece
                 file += 1
                 

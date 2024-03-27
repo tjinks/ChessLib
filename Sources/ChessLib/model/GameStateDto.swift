@@ -20,7 +20,7 @@ public struct GameStateDto {
     
     public var blackCanCastleLong: Bool
     
-    public var epSquare: Square?
+    public var epSquare: Int?
     
     public var halfMoveClock: Int
     

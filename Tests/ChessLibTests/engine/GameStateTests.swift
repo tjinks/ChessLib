@@ -19,7 +19,7 @@ final class GameStateTests: XCTestCase {
     func testMakeMove() throws {
         var position = Position()
         var gameState = GameState(initialPosition: position, initialHalfMoveClock: 0, initialFullMove: 1)
-        position = gameState.makeMove(Move(from: g1, to: f3, piece: .whiteKnight))
+        position = gameState.makeMove(.normal(from: g1, to: f3, promoteTo: nil))
         XCTAssertEqual(Player.black, position.playerToMove)
         XCTAssert(position == gameState.currentPosition)
     }
@@ -27,7 +27,7 @@ final class GameStateTests: XCTestCase {
     func testRetractLastMove() throws {
         var position = Position()
         var gameState = GameState(initialPosition: position, initialHalfMoveClock: 0, initialFullMove: 1)
-        gameState.makeMove(Move(from: g1, to: f3, piece: Piece(.white, .knight)))
+        gameState.makeMove(.normal(from: g1, to: f3, promoteTo: nil))
         position = gameState.retractLastMove()!
         XCTAssert(position == Position())
         XCTAssertNil(gameState.retractLastMove())
@@ -36,10 +36,10 @@ final class GameStateTests: XCTestCase {
     func testGetRepetitionCount() throws {
         let initialPosition = Position()
         var gameState = GameState(initialPosition: initialPosition, initialHalfMoveClock: 0, initialFullMove: 1)
-        gameState.makeMove(Move(from: g1, to: f3, piece: Piece(.white, .knight)))
-        gameState.makeMove(Move(from: g8, to: f6, piece: Piece(.black, .knight)))
-        gameState.makeMove(Move(from: f3, to: g1, piece: Piece(.white, .knight)))
-        gameState.makeMove(Move(from: f6, to: g8, piece: Piece(.black, .knight)))
+        gameState.makeMove(.normal(from: g1, to: f3, promoteTo: nil))
+        gameState.makeMove(.normal(from: g8, to: f6, promoteTo: nil))
+        gameState.makeMove(.normal(from: f3, to: g1, promoteTo: nil))
+        gameState.makeMove(.normal(from: f6, to: g8, promoteTo: nil))
         let repetitionCount = gameState.getRepetitionCount()
         XCTAssertEqual(2, repetitionCount)
     }

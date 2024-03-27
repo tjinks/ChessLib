@@ -114,15 +114,15 @@ struct Position: Equatable, Hashable {
         self.board = dto.board
         
         var kingSquare: [Int?] = [nil, nil]
-        try Square.forAll {
-            let piece = dto.board[$0.number]
+        try forAllSquares {
+            let piece = dto.board[$0]
             if piece.type == .king {
                 let index = piece.owner!.index
                 if kingSquare[index] != nil {
                     throw ChessError.duplicateKing
                 }
                 
-                kingSquare[index] = $0.number
+                kingSquare[index] = $0
             }
             
             return true
@@ -156,19 +156,20 @@ struct Position: Equatable, Hashable {
         self.castlingRights = castlingRights
         
         if let eps = dto.epSquare {
-            epSquare = eps.number
+            epSquare = eps
         } else {
             epSquare = nil
         }
     }
     
-    subscript(square: Square) -> Piece {
-        return board[square.number]
+    subscript(square: Int) -> Piece {
+        return board[square]
     }
     
     func makeMove(_ move: Move) -> Position {
         var board = self.board
         var kingSquare = self.kingSquare
+        var epSquare: Int? = nil
         
         switch move {
         case .castlesLong:
@@ -203,20 +204,28 @@ struct Position: Equatable, Hashable {
             
         case .normal(let from, let to, let promoteTo):
             if let promoteTo = promoteTo {
-                board[to.number] = promoteTo
+                board[to] = promoteTo
             } else {
-                board[to.number] = board[from.number]
+                board[to] = board[from]
             }
             
-            board[from.number] = .none
+            board[from] = .none
             if move.isEpCapture(self) {
                 let inc = playerToMove == .white ? -8 : 8
-                board[epSquare! + inc] = .none
+                board[self.epSquare! + inc] = .none
             }
             
-            switch board[to.number] {
+            switch board[to] {
             case .whiteKing, .blackKing:
-                kingSquare[playerToMove.index] = to.number
+                kingSquare[playerToMove.index] = to
+            case .whitePawn:
+                if to - from == 16 {
+                    epSquare = to - 8
+                }
+            case .blackPawn:
+                if from - to == 16 {
+                    epSquare = to + 8
+                }
             default:
                 break;
             }
@@ -233,21 +242,21 @@ struct Position: Equatable, Hashable {
                     rightsToRemove = blackKingside | blackQueenside
                 }
             case .normal(let from, let to, _):
-                if from.number == e1 {
+                if from == e1 {
                     rightsToRemove = whiteKingside | whiteQueenside
-                } else if from.number == e8 {
+                } else if from == e8 {
                     rightsToRemove = blackKingside | blackQueenside
                 }
-                if from.number == a1 || to.number == a1 {
+                if from == a1 || to == a1 {
                     rightsToRemove |= whiteQueenside
                 }
-                if from.number == h1 || to.number == h1 {
+                if from == h1 || to == h1 {
                     rightsToRemove |= whiteKingside
                 }
-                if from.number == a8 || to.number == a8 {
+                if from == a8 || to == a8 {
                     rightsToRemove |= blackQueenside
                 }
-                if from.number == h8 || to.number == h8 {
+                if from == h8 || to == h8 {
                     rightsToRemove |= blackKingside
                 }
             }

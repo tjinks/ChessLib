@@ -10,7 +10,7 @@ import Foundation
 enum Move {
     case castlesLong
     case castlesShort
-    case normal(from: Square, to: Square, promoteTo: Piece?)
+    case normal(from: Int, to: Int, promoteTo: Piece?)
 }
 
 extension Move {
@@ -26,7 +26,16 @@ extension Move {
     func isEpCapture(_ position: Position) -> Bool {
         switch self {
         case .normal(_, let to, _):
-            return to.number == position.epSquare
+            return to == position.epSquare
+        default:
+            return false
+        }
+    }
+    
+    func isPawnMove(_ position: Position) -> Bool {
+        switch self {
+        case .normal(let from, _, _):
+            return position[from].type == .pawn
         default:
             return false
         }
