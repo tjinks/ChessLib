@@ -43,7 +43,7 @@ public class EventDispatcher {
         }
     }
     
-    public func dispatch(_ event: Any) {
+    public func dispatch(_ event: Event) {
         if Thread.isMainThread {
             for h in handlers {
                 if h.processEvent(event) {

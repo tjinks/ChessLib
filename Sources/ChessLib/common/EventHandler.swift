@@ -19,11 +19,15 @@ public class EventHandler {
         self.dispatcher.deregister(self)
     }
     
-    public func processEvent(_ event: Any) -> Bool {
+    public func processEvent(_ event: Event) -> Bool {
         return false
     }
 
-    public func raiseEvent(_ event: Any) {
+    public func raiseEvent(_ event: Event) {
         dispatcher.dispatch(event)
     }
+}
+
+public func confirm(source: EventHandler, message: String, callback: @escaping (Bool) -> ()) {
+    source.raiseEvent(.confirm(message: message, callback: callback))
 }

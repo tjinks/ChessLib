@@ -6,3 +6,20 @@
 //
 
 import Foundation
+
+enum RunMode {
+    case humanVsHuman
+    case humanVsComputer
+    case computerVsHuman
+    case computerVsComputer
+}
+
+extension RunMode {
+    func switchSides() -> RunMode {
+        switch self {
+        case .humanVsComputer: return .computerVsHuman
+        case .computerVsHuman: return .humanVsComputer
+        default: return self
+        }
+    }
+}
