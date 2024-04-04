@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Move {
+public enum Move {
     case castlesLong
     case castlesShort
     case normal(from: Int, to: Int, promoteTo: Piece?)

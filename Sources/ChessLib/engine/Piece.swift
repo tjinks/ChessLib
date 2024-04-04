@@ -40,7 +40,7 @@ public enum Piece: Int8 {
     case whitePawn = 6, blackPawn = -6
 }
 
-extension Piece {
+public extension Piece {
     init(_ player: Player, _ type: PieceType) {
         self.init(rawValue: type.rawValue * (player == .black ? -1 : 1))!
     }

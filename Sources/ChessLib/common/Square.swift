@@ -8,19 +8,6 @@
 import Foundation
 
 public extension Int {
-    init(file: Int, rank: Int) throws {
-        let result = file + 8 * rank
-        if result >= 0 && result < 64 {
-            self = result
-        } else {
-            throw ChessError.invalidSquare
-        }
-    }
-    
-    init(name: String) throws {
-        self = try Notation.parseSquareName(name: name)
-    }
-    
     var file: Int {
         get {
             return self % 8
@@ -33,22 +20,20 @@ public extension Int {
         }
     }
     
-    var description: String {
-        get {
-            return Notation.getSquareName(self)
-        }
+    var isValidSquareNum: Bool {
+        return self >= 0 && self < 64
     }
 }
 
-func squareNum(file: Int, rank: Int) -> Int {
+public func squareNum(file: Int, rank: Int) -> Int {
     return file + 8 * rank
 }
 
-func squareNum(name: String) throws -> Int {
+public func squareNum(name: String) throws -> Int {
     return try Notation.parseSquareName(name: name)
 }
 
-func forAllSquares(callback: (Int) throws -> Bool) throws {
+public func forAllSquares(callback: (Int) throws -> Bool) throws {
     for i in 0...63 {
         if !(try callback(i)) {
             return

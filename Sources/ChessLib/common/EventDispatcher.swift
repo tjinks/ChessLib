@@ -10,6 +10,10 @@ import Foundation
 public class EventDispatcher {
     private var handlers: [EventHandler] = []
     
+    public init() {
+        
+    }
+    
     public func register(_ handler: EventHandler) {
         if Thread.isMainThread {
             for h in handlers {
@@ -46,9 +50,7 @@ public class EventDispatcher {
     public func dispatch(_ event: Event) {
         if Thread.isMainThread {
             for h in handlers {
-                if h.processEvent(event) {
-                    return
-                }
+                h.processEvent(event)
             }
         } else {
             DispatchQueue.main.async {

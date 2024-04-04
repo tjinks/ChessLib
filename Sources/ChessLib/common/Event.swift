@@ -12,11 +12,17 @@ public enum Event {
     case startUp
     case shutdownRequested
     
-    // Events from UI to controller
-    case setPosition(initialState: GameStateDto)
-    case squareClicked(file: Int, rank: Int)
+    // Events from UI to game controller
+    case setGameState(fen: String)
+    
+    // Events from UI to human move selection controller
+    case squareClicked(square: Int)
+    
+    // Events from move selection controller to game controller
+    case moveSelected(move: Move)
     
     // Events from controller to UI
+    case showGameState(state: GameStateDto)
     case moveMade(stateBefore: GameStateDto, stateAfter: GameStateDto)
     case gameOver(result: Result)
     case showError(message: String)

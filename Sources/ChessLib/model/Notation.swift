@@ -9,7 +9,7 @@ import Foundation
 
 public class Notation {
     public static let initialPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-
+    
     private static let fileChars:[Character] = ["a", "b", "c", "d", "e", "f", "g", "h"]
     private static let rankChars:[Character] = ["1", "2", "3", "4", "5", "6", "7", "8"]
     
@@ -28,10 +28,10 @@ public class Notation {
         let rankChar = name[name.index(after: name.startIndex)]
         if let file = fileChars.firstIndex(of: fileChar) {
             if let rank = rankChars.firstIndex(of: rankChar) {
-                return try Int(file: file, rank: rank)
+                return squareNum(file: file, rank: rank)
             }
         }
-
+        
         throw ChessError.invalidSquare
     }
     
@@ -156,7 +156,7 @@ public class Notation {
             }
             
             do {
-                epSquare = try Int(name: s)
+                epSquare = try squareNum(name: s)
             } catch ChessError.invalidSquare {
                 throw ChessError.invalidFen
             }
@@ -183,13 +183,12 @@ public class Notation {
                 return false
             }
             
-            do {
-                let square = try Int(file: file, rank: rank)
+            let square = squareNum(file: file, rank: rank)
+            if square.isValidSquareNum {
                 pieces[square] = piece
                 file += 1
-                
                 return true
-            } catch ChessError.invalidSquare {
+            } else {
                 throw ChessError.invalidFen
             }
         }

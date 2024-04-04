@@ -31,6 +31,11 @@ struct GameState {
         self.initialFullMove = initialFullMove
     }
     
+    init(dto: GameStateDto) throws {
+        let position = try Position(dto: dto)
+        self.init(initialPosition: position, initialHalfMoveClock: dto.halfMoveClock, initialFullMove: dto.fullMove)
+    }
+    
     @discardableResult mutating func makeMove(_ move: Move) -> Position {
         let newPosition = currentPosition.makeMove(move)
         let restartsClock = move.isCapture(currentPosition) || move.isPawnMove(currentPosition)
