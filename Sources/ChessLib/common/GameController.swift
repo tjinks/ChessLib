@@ -35,7 +35,7 @@ public class GameController: EventHandlerBase {
     private func setGameState(_ fen: String) {
         do {
             let dto = try Notation.parseFen(fen: fen)
-            let gameState = try GameState(dto: dto)
+            gameState = try GameState(dto: dto)
             raiseEvent(.showGameState(state: dto))
         } catch ChessError.invalidFen, ChessError.missingKing, ChessError.duplicateKing {
             raiseEvent(.showError(message: "Invalid FEN"))

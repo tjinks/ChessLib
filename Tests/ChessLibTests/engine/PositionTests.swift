@@ -112,7 +112,7 @@ final class PositionTests: XCTestCase {
     
     func testCastlingWhiteKingside() throws {
         let initialPosition = createPosition(positionForNormalMoveTest)
-        let move = Move.castlesShort
+        let move = Move.whiteCastlesShort
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {
@@ -137,7 +137,7 @@ final class PositionTests: XCTestCase {
 
     func testCastlingWhiteQueenside() throws {
         let initialPosition = createPosition(positionForNormalMoveTest)
-        let move = Move.castlesLong
+        let move = Move.whiteCastlesLong
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {
@@ -162,7 +162,7 @@ final class PositionTests: XCTestCase {
 
     func testCastlingBlackKingside() throws {
         let initialPosition = createPosition(positionForEpCaptureTest)
-        let move = Move.castlesShort
+        let move = Move.blackCastlesShort
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {
@@ -187,7 +187,7 @@ final class PositionTests: XCTestCase {
 
     func testCastlingBlackQueenside() throws {
         let initialPosition = createPosition(positionForEpCaptureTest)
-        let move = Move.castlesLong
+        let move = Move.blackCastlesLong
         let result = initialPosition.makeMove(move)
         for sqNum in 0...63 {
             switch sqNum {

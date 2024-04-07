@@ -161,19 +161,19 @@ struct MoveGenerator {
         switch player {
         case .white:
             if (position.castlingRights & whiteKingside) != 0 {
-                tryAdd(castlingMove: .castlesShort, intermediateSquares: [f1, g1])
+                tryAdd(castlingMove: .whiteCastlesShort, intermediateSquares: [f1, g1])
             }
             
             if (position.castlingRights & whiteQueenside) != 0 {
-                tryAdd(castlingMove: .castlesLong, intermediateSquares: [d1, c1, b1])
+                tryAdd(castlingMove: .whiteCastlesLong, intermediateSquares: [d1, c1, b1])
             }
         case .black:
             if (position.castlingRights & blackKingside) != 0 {
-                tryAdd(castlingMove: .castlesShort, intermediateSquares: [f8, g8])
+                tryAdd(castlingMove: .blackCastlesShort, intermediateSquares: [f8, g8])
             }
             
             if (position.castlingRights & blackQueenside) != 0 {
-                tryAdd(castlingMove: .castlesLong, intermediateSquares: [d8, c8, b8])
+                tryAdd(castlingMove: .blackCastlesLong, intermediateSquares: [d8, c8, b8])
             }
         }
         

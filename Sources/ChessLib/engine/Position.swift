@@ -172,36 +172,30 @@ struct Position: Equatable, Hashable {
         var epSquare: Int? = nil
         
         switch move {
-        case .castlesLong:
-            if playerToMove == .white {
+        case .whiteCastlesLong:
                 board[a1] = .none
                 board[c1] = .whiteKing
                 board[d1] = .whiteRook
                 board[e1] = .none
                 kingSquare[playerToMove.index] = c1
-            } else {
+        case .blackCastlesLong:
                 board[a8] = .none
                 board[c8] = .blackKing
                 board[d8] = .blackRook
                 board[e8] = .none
                 kingSquare[playerToMove.index] = c8
-            }
-            
-        case .castlesShort:
-            if playerToMove == .white {
+        case .whiteCastlesShort:
                 board[h1] = .none
                 board[g1] = .whiteKing
                 board[f1] = .whiteRook
                 board[e1] = .none
                 kingSquare[playerToMove.index] = g1
-            } else {
+        case .blackCastlesShort:
                 board[h8] = .none
                 board[g8] = .blackKing
                 board[f8] = .blackRook
                 board[e8] = .none
                 kingSquare[playerToMove.index] = g8
-            }
-            
         case .normal(let from, let to, let promoteTo):
             if let promoteTo = promoteTo {
                 board[to] = promoteTo
@@ -235,12 +229,10 @@ struct Position: Equatable, Hashable {
         if castlingRights != 0 {
             var rightsToRemove: Int8 = 0
             switch move {
-            case .castlesLong, .castlesShort:
-                if playerToMove == .white {
+            case .whiteCastlesLong, .whiteCastlesShort:
                     rightsToRemove = whiteKingside | whiteQueenside
-                } else {
+            case .blackCastlesLong, .blackCastlesShort:
                     rightsToRemove = blackKingside | blackQueenside
-                }
             case .normal(let from, let to, _):
                 if from == e1 {
                     rightsToRemove = whiteKingside | whiteQueenside

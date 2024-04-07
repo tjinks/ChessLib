@@ -39,49 +39,41 @@ extension [Move] {
         return false
     }
     
-    func containsCastling(_ position: Position, _ type: Int8) -> Bool {
+    func containsCastling(_ type: Int8) -> Bool {
         for m in self {
             switch type {
             case whiteKingside:
                 switch m {
-                case .castlesShort:
-                    if position.playerToMove == .white {
-                        return true
-                    }
+                case .whiteCastlesShort:
+                    return true
                 default:
                     break
                 }
-    
+                
             case whiteQueenside:
                 switch m {
-                case .castlesLong:
-                    if position.playerToMove == .white {
-                        return true
-                    }
+                case .whiteCastlesLong:
+                    return true
                 default:
                     break
                 }
-
+                
             case blackKingside:
                 switch m {
-                case .castlesShort:
-                    if position.playerToMove == .black {
-                        return true
-                    }
+                case .blackCastlesShort:
+                    return true
                 default:
                     break
                 }
-
+                
             case blackQueenside:
                 switch m {
-                case .castlesLong:
-                    if position.playerToMove == .black {
-                        return true
-                    }
+                case .blackCastlesLong:
+                    return true
                 default:
                     break
                 }
-
+                
             default:
                 break
             }
@@ -252,69 +244,69 @@ final class MoveGeneratorTests: XCTestCase {
     func testWhiteCastlingRights() {
         var position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R w kq")
         var result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertFalse(result.containsCastling(position, whiteKingside))
-        XCTAssertFalse(result.containsCastling(position, whiteQueenside))
+        XCTAssertFalse(result.containsCastling(whiteKingside))
+        XCTAssertFalse(result.containsCastling(whiteQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R w Kkq")
         result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertTrue(result.containsCastling(position, whiteKingside))
-        XCTAssertFalse(result.containsCastling(position, whiteQueenside))
+        XCTAssertTrue(result.containsCastling(whiteKingside))
+        XCTAssertFalse(result.containsCastling(whiteQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R w Qkq")
         result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertFalse(result.containsCastling(position, whiteKingside))
-        XCTAssertTrue(result.containsCastling(position, whiteQueenside))
+        XCTAssertFalse(result.containsCastling(whiteKingside))
+        XCTAssertTrue(result.containsCastling(whiteQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R w KQkq")
         result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertTrue(result.containsCastling(position, whiteKingside))
-        XCTAssertTrue(result.containsCastling(position, whiteQueenside))
+        XCTAssertTrue(result.containsCastling(whiteKingside))
+        XCTAssertTrue(result.containsCastling(whiteQueenside))
     }
     
     func testBlackCastlingRights() {
         var position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R b KQ")
         var result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertFalse(result.containsCastling(position, blackKingside))
-        XCTAssertFalse(result.containsCastling(position, blackQueenside))
+        XCTAssertFalse(result.containsCastling(blackKingside))
+        XCTAssertFalse(result.containsCastling(blackQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R b KQk")
         result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertTrue(result.containsCastling(position, blackKingside))
-        XCTAssertFalse(result.containsCastling(position, blackQueenside))
+        XCTAssertTrue(result.containsCastling(blackKingside))
+        XCTAssertFalse(result.containsCastling(blackQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R b KQq")
         result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertFalse(result.containsCastling(position, blackKingside))
-        XCTAssertTrue(result.containsCastling(position, blackQueenside))
+        XCTAssertFalse(result.containsCastling(blackKingside))
+        XCTAssertTrue(result.containsCastling(blackQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R b KQkq")
         result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertTrue(result.containsCastling(position, blackKingside))
-        XCTAssertTrue(result.containsCastling(position, blackQueenside))
+        XCTAssertTrue(result.containsCastling(blackKingside))
+        XCTAssertTrue(result.containsCastling(blackQueenside))
     }
     
     func testCastlingPreventedBySelf() {
         var position = parseFen("r3k2r/8/8/8/8/8/8/RN2KB1R w KQ")
         var result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertFalse(result.containsCastling(position, whiteKingside))
-        XCTAssertFalse(result.containsCastling(position, whiteQueenside))
+        XCTAssertFalse(result.containsCastling(whiteKingside))
+        XCTAssertFalse(result.containsCastling(whiteQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/RN2K2R w KQ")
         result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertTrue(result.containsCastling(position, whiteKingside))
-        XCTAssertFalse(result.containsCastling(position, whiteQueenside))
+        XCTAssertTrue(result.containsCastling(whiteKingside))
+        XCTAssertFalse(result.containsCastling(whiteQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3KB1R w KQ")
         result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertFalse(result.containsCastling(position, whiteKingside))
-        XCTAssertTrue(result.containsCastling(position, whiteQueenside))
+        XCTAssertFalse(result.containsCastling(whiteKingside))
+        XCTAssertTrue(result.containsCastling(whiteQueenside))
     }
     
     func testCastlingPreventedByOpponent() {
         let position = parseFen("r3k2r/8/8/8/2q5/8/8/R3K2R w KQ")
         let result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
-        XCTAssertFalse(result.containsCastling(position, whiteKingside))
-        XCTAssertFalse(result.containsCastling(position, whiteQueenside))
+        XCTAssertFalse(result.containsCastling(whiteKingside))
+        XCTAssertFalse(result.containsCastling(whiteQueenside))
     }
     
     private func getMoves(_ fen: String) -> [Move] {

@@ -18,7 +18,7 @@ final class GameStateTests: XCTestCase {
 
     func testMakeMove() throws {
         var position = Position()
-        var gameState = GameState(initialPosition: position, initialHalfMoveClock: 0, initialFullMove: 1)
+        let gameState = GameState(initialPosition: position, initialHalfMoveClock: 0, initialFullMove: 1)
         position = gameState.makeMove(.normal(from: g1, to: f3, promoteTo: nil))
         XCTAssertEqual(Player.black, position.playerToMove)
         XCTAssert(position == gameState.currentPosition)
@@ -26,7 +26,7 @@ final class GameStateTests: XCTestCase {
     
     func testRetractLastMove() throws {
         var position = Position()
-        var gameState = GameState(initialPosition: position, initialHalfMoveClock: 0, initialFullMove: 1)
+        let gameState = GameState(initialPosition: position, initialHalfMoveClock: 0, initialFullMove: 1)
         gameState.makeMove(.normal(from: g1, to: f3, promoteTo: nil))
         position = gameState.retractLastMove()!
         XCTAssert(position == Position())
@@ -35,7 +35,7 @@ final class GameStateTests: XCTestCase {
     
     func testGetRepetitionCount() throws {
         let initialPosition = Position()
-        var gameState = GameState(initialPosition: initialPosition, initialHalfMoveClock: 0, initialFullMove: 1)
+        let gameState = GameState(initialPosition: initialPosition, initialHalfMoveClock: 0, initialFullMove: 1)
         gameState.makeMove(.normal(from: g1, to: f3, promoteTo: nil))
         gameState.makeMove(.normal(from: g8, to: f6, promoteTo: nil))
         gameState.makeMove(.normal(from: f3, to: g1, promoteTo: nil))

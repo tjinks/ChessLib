@@ -21,6 +21,10 @@ public enum Event {
     // Events from move selection controller to game controller
     case moveSelected(move: Move)
     
+    // Events from game controller to move selection controller
+    case startHumanMoveSelection(state: GameStateDto)
+    case startComputerMoveSelection(state: GameStateDto)
+    
     // Events from controller to UI
     case showGameState(state: GameStateDto)
     case moveMade(stateBefore: GameStateDto, stateAfter: GameStateDto)

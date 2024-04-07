@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct GameState {
+class GameState {
     struct HistoryItem {
         let position: Position
         let isRepetitionBoundary: Bool
@@ -31,12 +31,16 @@ struct GameState {
         self.initialFullMove = initialFullMove
     }
     
-    init(dto: GameStateDto) throws {
+    convenience init(dto: GameStateDto) throws {
         let position = try Position(dto: dto)
         self.init(initialPosition: position, initialHalfMoveClock: dto.halfMoveClock, initialFullMove: dto.fullMove)
     }
     
-    @discardableResult mutating func makeMove(_ move: Move) -> Position {
+    func getHistory() -> [HistoryItem] {
+        return history
+    }
+    
+    @discardableResult func makeMove(_ move: Move) -> Position {
         let newPosition = currentPosition.makeMove(move)
         let restartsClock = move.isCapture(currentPosition) || move.isPawnMove(currentPosition)
         let halfMoveClock = restartsClock ? 0 : halfMoveClock + 1
@@ -49,7 +53,7 @@ struct GameState {
         return newPosition
     }
     
-    @discardableResult mutating func retractLastMove() -> Position? {
+    @discardableResult func retractLastMove() -> Position? {
         if history.count > 1 {
             history.removeLast()
             return currentPosition

@@ -8,8 +8,10 @@
 import Foundation
 
 public enum Move {
-    case castlesLong
-    case castlesShort
+    case whiteCastlesLong
+    case whiteCastlesShort
+    case blackCastlesLong
+    case blackCastlesShort
     case normal(from: Int, to: Int, promoteTo: Piece?)
 }
 
@@ -43,9 +45,9 @@ extension Move {
     
     func score(position: Position) -> Double {
         switch self {
-        case .castlesLong:
+        case .whiteCastlesLong, .blackCastlesLong:
             return 0.4
-        case .castlesShort:
+        case .whiteCastlesShort, .blackCastlesShort:
             return 0.5
         case .normal(_, _, let promoteTo):
             if promoteTo != nil {
