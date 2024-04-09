@@ -7,6 +7,18 @@
 
 import Foundation
 
+public struct SetGameState {
+    public let fen: String
+    
+    public init(fen: String) {
+        self.fen = fen
+    }
+}
+
+struct MoveSelected {
+    let move: Move
+}
+
 public class GameController: EventHandlerBase {
     private enum State {
         case notPlaying
@@ -20,27 +32,24 @@ public class GameController: EventHandlerBase {
     
     override public init(dispatcher: EventDispatcher) {
         super.init(dispatcher: dispatcher)
-        setGameState(Notation.initialPosition)
+        processSetGameState(Notation.initialPosition)
     }
     
-    override public func processEvent(_ event: Event) {
-        switch event {
-        case .setGameState(let fen):
-            setGameState(fen)
-        default:
-            return
+    override public func processEvent(_ event: Any) {
+        if let setGameState = event as? SetGameState {
+            processSetGameState(setGameState.fen)
         }
     }
     
-    private func setGameState(_ fen: String) {
+    private func processSetGameState(_ fen: String) {
         do {
             let dto = try Notation.parseFen(fen: fen)
             gameState = try GameState(dto: dto)
-            raiseEvent(.showGameState(state: dto))
+            raiseEvent(UiEvent.showGameState(state: dto))
         } catch ChessError.invalidFen, ChessError.missingKing, ChessError.duplicateKing {
-            raiseEvent(.showError(message: "Invalid FEN"))
+            raiseEvent(UiEvent.showError(message: "Invalid FEN"))
         } catch {
-            raiseEvent(.showError(message: "An unexpected error has occurred"))
+            raiseEvent(UiEvent.showError(message: "An unexpected error has occurred"))
         }
     }
 }

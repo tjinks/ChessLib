@@ -47,10 +47,14 @@ public class EventDispatcher {
         }
     }
     
-    public func dispatch(_ event: Event) {
+    public func dispatch(_ event: Any) {
         if Thread.isMainThread {
             for h in handlers {
                 h.processEvent(event)
+            }
+            
+            if event is ShutdownInProgress {
+                handlers = []
             }
         } else {
             DispatchQueue.main.async {

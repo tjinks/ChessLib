@@ -8,21 +8,17 @@
 import Foundation
 
 open class EventHandlerBase: EventHandler {
-    weak var dispatcher: EventDispatcher?
+    private let dispatcher: EventDispatcher
     
     public init(dispatcher: EventDispatcher) {
         self.dispatcher = dispatcher
         dispatcher.register(self)
     }
     
-    open func processEvent(_ event: Event) {
+    open func processEvent(_ event: Any) {
     }
     
-    public func raiseEvent(_ event: Event) {
-        dispatcher?.dispatch(event)
-    }
-    
-    deinit {
-        dispatcher?.deregister(self)
+    public func raiseEvent(_ event: Any) {
+        dispatcher.dispatch(event)
     }
 }

@@ -8,5 +8,5 @@
 import Foundation
 
 public protocol EventHandler: AnyObject {
-    func processEvent(_ event: Event)
+    func processEvent(_ event: Any)
 }
