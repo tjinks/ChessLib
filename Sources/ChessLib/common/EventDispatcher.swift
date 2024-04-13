@@ -9,6 +9,7 @@ import Foundation
 
 public class EventDispatcher {
     private var handlers: [EventHandler] = []
+    private var shuttingDown = false
     
     public init() {
         
@@ -16,6 +17,10 @@ public class EventDispatcher {
     
     public func register(_ handler: EventHandler) {
         if Thread.isMainThread {
+            if shuttingDown {
+                return
+            }
+            
             for h in handlers {
                 if h === handler {
                     return
@@ -49,12 +54,17 @@ public class EventDispatcher {
     
     public func dispatch(_ event: Any) {
         if Thread.isMainThread {
+            if shuttingDown {
+                return
+            }
+            
             for h in handlers {
                 h.processEvent(event)
             }
             
             if event is ShutdownInProgress {
                 handlers = []
+                shuttingDown = true
             }
         } else {
             DispatchQueue.main.async {

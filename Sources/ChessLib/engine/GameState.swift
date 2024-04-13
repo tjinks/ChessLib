@@ -40,6 +40,23 @@ class GameState {
         return history
     }
     
+    func toDto() -> GameStateDto {
+        let whiteCanCastleShort = (currentPosition.castlingRights & whiteKingside) != 0
+        let whiteCanCastleLong = (currentPosition.castlingRights & whiteQueenside) != 0
+        let blackCanCastleShort = (currentPosition.castlingRights & blackKingside) != 0
+        let blackCanCastleLong = (currentPosition.castlingRights & blackKingside) != 0
+        return GameStateDto(
+            board: currentPosition.board,
+            playerToMove: currentPosition.playerToMove, 
+            whiteCanCastleShort: whiteCanCastleShort,
+            whiteCanCastleLong: whiteCanCastleLong,
+            blackCanCastleShort: blackCanCastleShort,
+            blackCanCastleLong: blackCanCastleLong,
+            epSquare: currentPosition.epSquare,
+            halfMoveClock: halfMoveClock,
+            fullMove: fullMove)
+    }
+    
     @discardableResult func makeMove(_ move: Move) -> Position {
         let newPosition = currentPosition.makeMove(move)
         let restartsClock = move.isCapture(currentPosition) || move.isPawnMove(currentPosition)

@@ -26,6 +26,7 @@ class MoveSelectionController : EventHandlerBase {
     }
     
     private var gameState: GameState?
+    private var potentialMoves: [Move]?
     
     private var state = State.inactive
     private var initialSquare: Int = -1
@@ -46,9 +47,17 @@ class MoveSelectionController : EventHandlerBase {
         case .inactive:
             break
         case .beforeInitialSquareSelected:
-            break
+            potentialMoves = getMovesStartingFrom(square)
+            if potentialMoves!.count > 0 {
+                var highlights = potentialMoves!.map { return $0.to }
+                highlights.append(square)
+                state = .afterInitialSquareSelected
+                raiseEvent(UiEvent.showHighlights(highlights: highlights))
+            }
         case .afterInitialSquareSelected:
-            break
+            if let move = getMoveEndingAt(square) {
+                //TODO - show highlights
+            }
         }
     }
     
@@ -56,31 +65,15 @@ class MoveSelectionController : EventHandlerBase {
         let position = gameState!.currentPosition
         let moveList = MoveGenerator.run(position: position, player: position.playerToMove)
         return moveList.getMoves(position: position).filter {
-            switch $0 {
-            case .whiteCastlesLong, .whiteCastlesShort:
-                return square == e1
-            case .blackCastlesLong, .blackCastlesShort:
-                return square == e8
-            case .normal(let from, _, _):
-                return square == from
-            }
+            return $0.from == square
         }
     }
     
-    private static func getMovesEndingAt(moves: [Move], square: Int) -> [Move] {
-        return moves.filter {
-            switch $0 {
-            case .whiteCastlesLong:
-                return square == c1
-            case .whiteCastlesShort:
-                return square == g1
-            case .blackCastlesLong:
-                return square == c8
-            case .blackCastlesShort:
-                return square == g8
-            case .normal(_, let to, _):
-                return square == to
-            }
+    private func getMoveEndingAt(_ square: Int) -> Move? {
+        let m = potentialMoves!.filter {
+            return $0.to == square
         }
+        
+        return m.count > 0 ? m[0] : nil
     }
 }

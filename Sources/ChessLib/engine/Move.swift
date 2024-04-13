@@ -16,6 +16,36 @@ public enum Move {
 }
 
 extension Move {
+    var from: Int {
+        get {
+            switch self {
+            case .whiteCastlesLong, .whiteCastlesShort:
+                return e1
+            case .blackCastlesLong, .blackCastlesShort:
+                return e8
+            case .normal(let f, _, _):
+                return f
+            }
+        }
+    }
+    
+    var to: Int {
+        get {
+            switch self {
+            case .whiteCastlesLong:
+                return c1
+            case .whiteCastlesShort:
+                return g1
+            case .blackCastlesLong:
+                return c8
+            case .blackCastlesShort:
+                return g8
+            case .normal(_, let t, _):
+                return t
+            }
+        }
+    }
+    
     func isCapture(_ position: Position) -> Bool {
         switch self {
         case .normal(_, let to, _):

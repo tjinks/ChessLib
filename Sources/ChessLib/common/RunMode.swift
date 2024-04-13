@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum RunMode {
+public enum RunMode {
     case humanVsHuman
     case humanVsComputer
     case computerVsHuman
