@@ -7,19 +7,7 @@
 
 import Foundation
 
-public struct SquareClicked {
-    public let square: Int
-    
-    public init(square: Int) {
-        self.square = square
-    }
-}
-
-struct StartHumanMoveSelection {
-    let gameState: GameState
-}
-
-class MoveSelectionController : EventHandlerBase {
+class MoveSelectionController {
     private enum State {
         case inactive
         case beforeInitialSquareSelected, afterInitialSquareSelected
@@ -31,13 +19,30 @@ class MoveSelectionController : EventHandlerBase {
     private var state = State.inactive
     private var initialSquare: Int = -1
     
-    override func processEvent(_ event: Any) {
-        if let squareClicked = event as? SquareClicked {
-            processClick(square: squareClicked.square)
-        } else if let startHumanMoveSelection = event as? StartHumanMoveSelection {
+    private let dispatcher: EventDispatcher
+    
+    init(dispatcher: EventDispatcher) {
+        self.dispatcher = dispatcher
+        dispatcher.register(processEvent)
+    }
+    
+    private func processEvent(_ event: Any) {
+        if let event = event as? GlobalEvent {
+            switch event {
+            case .squareClicked(let square):
+                processClick(square: square)
+            default:
+                break
+            }
+        } else if let event = event as? InternalEvent {
             if state == .inactive {
-                self.gameState = startHumanMoveSelection.gameState
-                state = .beforeInitialSquareSelected
+                switch event {
+                case .startHumanMoveSelection(let gameState):
+                    self.gameState = gameState
+                    state = .beforeInitialSquareSelected
+                default:
+                    break
+                }
             }
         }
     }
@@ -47,16 +52,23 @@ class MoveSelectionController : EventHandlerBase {
         case .inactive:
             break
         case .beforeInitialSquareSelected:
-            potentialMoves = getMovesStartingFrom(square)
-            if potentialMoves!.count > 0 {
-                var highlights = potentialMoves!.map { return $0.to }
+            let potentialMoves = getMovesStartingFrom(square)
+            if potentialMoves.count > 0 {
+                var highlights = potentialMoves.map { return $0.to }
                 highlights.append(square)
+                self.potentialMoves = potentialMoves
                 state = .afterInitialSquareSelected
-                raiseEvent(UiEvent.showHighlights(highlights: highlights))
+                dispatcher.dispatch(GlobalEvent.showHighlights(highlights: highlights))
+            } else {
+                dispatcher.dispatch(GlobalEvent.showHighlights(highlights: []))
             }
         case .afterInitialSquareSelected:
             if let move = getMoveEndingAt(square) {
-                //TODO - show highlights
+                state = .inactive
+                dispatcher.dispatch(InternalEvent.moveSelected(move: move))
+            } else {
+                state = .beforeInitialSquareSelected
+                processClick(square: square)
             }
         }
     }

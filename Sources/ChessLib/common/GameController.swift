@@ -27,56 +27,74 @@ struct MoveSelected {
     let move: Move
 }
 
-public class GameController: EventHandlerBase {
-    private enum State {
-        case notPlaying
-        case humanMoveSelectionInProgress
-        case computerMoveSelectionInProgress
-    }
-    
-    private var state = State.notPlaying
+public class GameController {
+    private let dispatcher: EventDispatcher
     private var mode = RunMode.humanVsHuman
-    private var gameState: GameState?
+    private var gameState: GameState? = nil
+    private var state = noopEventHandler
     
-    override public init(dispatcher: EventDispatcher) {
-        super.init(dispatcher: dispatcher)
+    public init(dispatcher: EventDispatcher) {
+        self.dispatcher = dispatcher
+        dispatcher.register(processEvent)
         _ = MoveSelectionController(dispatcher: dispatcher)
-        processSetGameState(Notation.initialPosition)
+        state = notPlaying
+        processEvent(GlobalEvent.setGameState(fen: Notation.initialPosition))
     }
     
-    override public func processEvent(_ event: Any) {
+    private func processEvent(_ event: Any) {
+        state(event)
+        /*
         if let setGameState = event as? SetGameState {
             processSetGameState(setGameState.fen)
         } else if let moveSelected = event as? MoveSelected {
             let move = moveSelected.move
             gameState!.makeMove(move)
-            raiseEvent(UiEvent.showGameState(state: gameState!.toDto()))
+            dispatcher.dispatch(GlobalEvent.showGameState(state: gameState!.toDto()))
         } else if let setRunMode = event as? SetRunMode {
             
         }
-        
+        */
         
     }
     
-    private func processSetRunMode(runMode: RunMode) {
-        switch state {
-        default:
-            return
+    private func notPlaying(event: Any) {
+        if let event = event as? GlobalEvent {
+            switch event {
+            case .setGameState(let fen):
+                processSetGameState(fen)
+            case .setRunMode(let runMode):
+                mode = runMode
+            case .startGame:
+                state = playingHumanVsHuman
+                dispatcher.dispatch(InternalEvent.startHumanMoveSelection(gameState: gameState!))
+            default:
+                break
+            }
+        }
+    }
+    
+    private func playingHumanVsHuman(event: Any) {
+        let gameState = gameState!
+        if let event = event as? InternalEvent {
+            switch event {
+            case .moveSelected(let move):
+                gameState.makeMove(move)
+                dispatcher.dispatch(GlobalEvent.showGameState(state: gameState.toDto()))
+                let result = gameState.getResult()
+                if result != .none {
+                    dispatcher.dispatch(GlobalEvent.gameOver(result: result))
+                    state = notPlaying
+                } else {
+                    dispatcher.dispatch(InternalEvent.startHumanMoveSelection(gameState: gameState))
+                }
+            default:
+                break
+            }
         }
     }
     
     private func processMoveSelected(move: Move) {
         switch state {
-        case .humanMoveSelectionInProgress:
-            gameState!.makeMove(move)
-            // TODO - check for end of game here
-            
-            raiseEvent(UiEvent.showGameState(state: gameState!.toDto()))
-            if mode == .humanVsHuman {
-                raiseEvent(StartHumanMoveSelection(gameState: gameState!))
-            } else {
-                // TODO
-            }
         default:
             // TODO
             break
@@ -84,16 +102,14 @@ public class GameController: EventHandlerBase {
     }
     
     private func processSetGameState(_ fen: String) {
-        // TODO - need to put up warning dialog here if not in notPlaying state?)
         do {
             let dto = try Notation.parseFen(fen: fen)
             gameState = try GameState(dto: dto)
-            raiseEvent(UiEvent.showGameState(state: dto))
-            raiseEvent(StartHumanMoveSelection(gameState: gameState!))
+            dispatcher.dispatch(GlobalEvent.showGameState(state: dto))
         } catch ChessError.invalidFen, ChessError.missingKing, ChessError.duplicateKing {
-            raiseEvent(UiEvent.showError(message: "Invalid FEN"))
+            dispatcher.dispatch(GlobalEvent.showError(message: "Invalid FEN"))
         } catch {
-            raiseEvent(UiEvent.showError(message: "An unexpected error has occurred"))
+            dispatcher.dispatch(GlobalEvent.showError(message: "An unexpected error has occurred"))
         }
     }
 }

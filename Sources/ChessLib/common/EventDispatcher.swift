@@ -7,6 +7,10 @@
 
 import Foundation
 
+public typealias EventHandler = (Any) -> ()
+
+public let noopEventHandler: EventHandler = { _ in return }
+
 public class EventDispatcher {
     private var handlers: [EventHandler] = []
     private var shuttingDown = false
@@ -15,39 +19,16 @@ public class EventDispatcher {
         
     }
     
-    public func register(_ handler: EventHandler) {
+    public func register(_ handler: @escaping EventHandler) {
         if Thread.isMainThread {
             if shuttingDown {
                 return
-            }
-            
-            for h in handlers {
-                if h === handler {
-                    return
-                }
             }
             
             handlers.append(handler)
         } else {
             DispatchQueue.main.sync {
                 register(handler)
-            }
-        }
-    }
-    
-    public func deregister(_ handler: EventHandler) {
-        if Thread.isMainThread {
-            var tmp: [EventHandler] = []
-            for h in handlers {
-                if h !== handler {
-                    tmp.append(h)
-                }
-            }
-            
-            handlers = tmp
-        } else {
-            DispatchQueue.main.sync {
-                deregister(handler)
             }
         }
     }
@@ -59,10 +40,10 @@ public class EventDispatcher {
             }
             
             for h in handlers {
-                h.processEvent(event)
+                h(event)
             }
             
-            if event is ShutdownInProgress {
+            if isShutdownInProgress(event) {
                 handlers = []
                 shuttingDown = true
             }

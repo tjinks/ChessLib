@@ -125,3 +125,23 @@ class GameState {
         return initialFullMove + incr
     }
 }
+
+extension GameState {
+    func getResult() -> Result {
+        let position = currentPosition
+        switch position.mateCheck() {
+        case .checkmate:
+            return position.playerToMove == .black ? .whiteWin : .blackWin
+        case .stalemate:
+            return .draw
+        default:
+            break
+        }
+        
+        if getRepetitionCount() >= 3 {
+            return .draw
+        }
+        
+        return .none
+    }
+}
