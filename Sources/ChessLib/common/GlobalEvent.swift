@@ -19,7 +19,8 @@ public enum GlobalEvent {
     case gameOver(result: Result)
     case showError(message: String)
     case confirm(message: String, callback: (Bool) -> ())
-    case showPromotionDialog(callback: (Piece) -> ())
+    case showPromotionDialog
+    case promoteTo(piece: PieceType)
     case squareClicked(square: Int)
 }
 

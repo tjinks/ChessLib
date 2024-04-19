@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Tony on 04/04/2024.
 //
@@ -11,6 +11,7 @@ class MoveSelectionController {
     private enum State {
         case inactive
         case beforeInitialSquareSelected, afterInitialSquareSelected
+        case waitingForPromotionDialog
     }
     
     private var gameState: GameState?
@@ -31,6 +32,8 @@ class MoveSelectionController {
             switch event {
             case .squareClicked(let square):
                 processClick(square: square)
+            case .promoteTo(let pieceType):
+                processPromotion(to: pieceType)
             default:
                 break
             }
@@ -46,11 +49,9 @@ class MoveSelectionController {
             }
         }
     }
- 
+    
     private func processClick(square: Int) {
         switch state {
-        case .inactive:
-            break
         case .beforeInitialSquareSelected:
             let potentialMoves = getMovesStartingFrom(square)
             if potentialMoves.count > 0 {
@@ -62,15 +63,62 @@ class MoveSelectionController {
             } else {
                 dispatcher.dispatch(GlobalEvent.showHighlights(highlights: []))
             }
+
         case .afterInitialSquareSelected:
-            if let move = getMoveEndingAt(square) {
-                state = .inactive
-                dispatcher.dispatch(InternalEvent.moveSelected(move: move))
+            let moves = getMovesEndingAt(square)
+            if moves.count > 0 {
+                let move = moves[0]
+                switch move {
+                case .normal(_, _, let promoteTo):
+                    if promoteTo != nil {
+                        potentialMoves = moves
+                        state = .waitingForPromotionDialog
+                        dispatcher.dispatch(GlobalEvent.showPromotionDialog)
+                        return
+                    }
+                default:
+                    break
+                }
+
+                dispatchMove(move)
             } else {
                 state = .beforeInitialSquareSelected
                 processClick(square: square)
             }
+
+        default:
+            break
         }
+    }
+    
+    private func processPromotion(to: PieceType) {
+        switch state {
+        case .waitingForPromotionDialog:
+            let promotionMove = getPromotionMove(matching: to)
+            dispatchMove(promotionMove)
+        default:
+            break
+        }
+    }
+    
+    private func dispatchMove(_ move: Move) {
+        state = .inactive
+        dispatcher.dispatch(InternalEvent.moveSelected(move: move))
+    }
+    
+    private func getPromotionMove(matching: PieceType) -> Move {
+        let playerToMove = gameState!.currentPosition.playerToMove
+        let piece = Piece(playerToMove, matching)
+        let matching = potentialMoves!.filter {
+            switch $0 {
+            case .normal(_, _, let promoteTo):
+                return piece == promoteTo
+            default:
+                return false
+            }
+        }
+
+        return matching[0]
     }
     
     private func getMovesStartingFrom(_ square: Int) -> [Move] {
@@ -81,11 +129,9 @@ class MoveSelectionController {
         }
     }
     
-    private func getMoveEndingAt(_ square: Int) -> Move? {
-        let m = potentialMoves!.filter {
+    private func getMovesEndingAt(_ square: Int) -> [Move] {
+        return potentialMoves!.filter {
             return $0.to == square
         }
-        
-        return m.count > 0 ? m[0] : nil
     }
 }
