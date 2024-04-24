@@ -8,21 +8,21 @@
 import Foundation
 
 
-struct MoveGenerator {
+class MoveGenerator {
     private let position: Position
-    private let moveList: MoveList
+    private var result: [Move]
     private let player: Player
     private let opponent: Player
     
-    static func run(position: Position, player: Player) -> MoveList {
-        MoveGenerator(position: position, player: player).moveList
+    static func run(position: Position, player: Player) -> [Move] {
+        MoveGenerator(position: position, player: player).result
     }
     
     private init(position: Position, player: Player) {
         self.position = position
         self.player = player
         opponent = player.other
-        moveList = MoveList()
+        result = []
         
         for from in 0..<64 {
             if (position.board[from].owner == player) {
@@ -126,8 +126,12 @@ struct MoveGenerator {
     }
     
     private func addMove(_ move: Move) {
-        let score = move.score(position: position)
-        moveList.add(move: move, score: score)
+        let newPosition = position.makeMove(move)
+        if newPosition.isInCheck(player: position.playerToMove) {
+            return
+        }
+        
+        result.append(move)
     }
     
     private func addPawnCaptures(from: Int) {

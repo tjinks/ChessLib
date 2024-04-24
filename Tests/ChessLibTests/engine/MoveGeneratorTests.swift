@@ -94,12 +94,12 @@ final class MoveGeneratorTests: XCTestCase {
     
     private func getMoves(_ position: Position) -> [Move] {
         let ml = MoveGenerator.run(position: position, player: position.playerToMove)
-        return ml.getMoves(position: position)
+        return ml
     }
     
     func testRookMoves() throws {
         let position = parseFen("8/8/3kr3/8/8/8/2K1R3/8 w -")
-        var result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        var result = MoveGenerator.run(position: position, player: position.playerToMove)
         result = result.startingFrom(e2)
         XCTAssertEqual(9, result.count)
         XCTAssertTrue(result.containsMove(position, to: e3))
@@ -115,7 +115,7 @@ final class MoveGeneratorTests: XCTestCase {
     
     func testBishopMoves() throws {
         let position = parseFen("8/4k3/4b3/8/2B5/4K3/4R3/8 w -")
-        var result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        var result = MoveGenerator.run(position: position, player: position.playerToMove)
         result = result.startingFrom(c4)
         XCTAssertEqual(7, result.count)
         XCTAssertTrue(result.containsMove(position, to: b5))
@@ -129,7 +129,7 @@ final class MoveGeneratorTests: XCTestCase {
     
     func testQueenMoves() throws {
         let position = parseFen("8/4k3/4b3/2r5/2Q1B3/4K3/4R3/8 w -")
-        let result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position).startingFrom(c4)
+        let result = MoveGenerator.run(position: position, player: position.playerToMove).startingFrom(c4)
         XCTAssertEqual(14, result.count)
         XCTAssertTrue(result.containsMove(position, to: c5, isCapture: true))
         XCTAssertTrue(result.containsMove(position, to: d5))
@@ -149,7 +149,7 @@ final class MoveGeneratorTests: XCTestCase {
     
     func testKnightMoves() throws {
         let position = parseFen("8/4k3/1r6/8/2N5/4K3/8/8 w -")
-        let result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position).startingFrom(c4)
+        let result = MoveGenerator.run(position: position, player: position.playerToMove).startingFrom(c4)
         XCTAssertEqual(7, result.count)
         XCTAssertTrue(result.containsMove(position, to: b6, isCapture: true))
         XCTAssertTrue(result.containsMove(position, to: d6))
@@ -162,7 +162,7 @@ final class MoveGeneratorTests: XCTestCase {
     
     func testKingMoves() throws {
         let position = parseFen("8/8/4k3/8/8/4K3/3p4/8 w -")
-        let result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position).startingFrom(e3)
+        let result = MoveGenerator.run(position: position, player: position.playerToMove).startingFrom(e3)
         XCTAssertEqual(8, result.count)
         XCTAssertTrue(result.containsMove(position, to: e4))
         XCTAssertTrue(result.containsMove(position, to: f4))
@@ -176,7 +176,7 @@ final class MoveGeneratorTests: XCTestCase {
     
     func testPawnMoves() throws {
         let position = parseFen("4k3/8/8/8/2p5/p4P2/P1P1P3/4K3 w -")
-        let all = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        let all = MoveGenerator.run(position: position, player: position.playerToMove)
         var result = all.startingFrom(a2)
         XCTAssertEqual(0, result.count)
         
@@ -196,7 +196,7 @@ final class MoveGeneratorTests: XCTestCase {
     
     func testPawnCaptures() throws {
         let position = parseFen("4k3/8/8/8/2p5/1P1P4/8/4K3 b -")
-        let result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position).startingFrom(c4)
+        let result = MoveGenerator.run(position: position, player: position.playerToMove).startingFrom(c4)
         XCTAssertEqual(3, result.count)
         XCTAssertTrue(result.containsMove(position, to: b3, isCapture: true))
         XCTAssertTrue(result.containsMove(position, to: c3))
@@ -205,7 +205,7 @@ final class MoveGeneratorTests: XCTestCase {
     
     func testEpCapture() throws {
         let position = parseFen("4k3/8/8/8/2pP4/8/8/4K3 b - d3")
-        let result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position).startingFrom(c4)
+        let result = MoveGenerator.run(position: position, player: position.playerToMove).startingFrom(c4)
         XCTAssertEqual(2, result.count)
         XCTAssertTrue(result.containsMove(position, to: c3))
         XCTAssertTrue(result.containsMove(position, to: d3, isCapture: true))
@@ -213,7 +213,7 @@ final class MoveGeneratorTests: XCTestCase {
     
     func testWhitePromotion() throws {
         let position = parseFen("1q2k3/2P5/8/8/8/8/8/4K3 w - -")
-        let result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position).startingFrom(c7)
+        let result = MoveGenerator.run(position: position, player: position.playerToMove).startingFrom(c7)
         XCTAssertEqual(8, result.count)
         XCTAssertTrue(result.containsMove(position, to: b8, isCapture: true, promoteTo: Piece(.white, .queen)))
         XCTAssertTrue(result.containsMove(position, to: b8, isCapture: true, promoteTo: Piece(.white, .rook)))
@@ -228,7 +228,7 @@ final class MoveGeneratorTests: XCTestCase {
     
     func testBlackPromotion() throws {
         let position = parseFen("4k3/8/8/8/8/8/2p5/1R2K3 b - -")
-        let result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position).startingFrom(c2)
+        let result = MoveGenerator.run(position: position, player: position.playerToMove).startingFrom(c2)
         XCTAssertEqual(8, result.count)
         XCTAssertTrue(result.containsMove(position, to: b1, isCapture: true, promoteTo: Piece(.black, .queen)))
         XCTAssertTrue(result.containsMove(position, to: b1, isCapture: true, promoteTo: Piece(.black, .rook)))
@@ -243,68 +243,68 @@ final class MoveGeneratorTests: XCTestCase {
     
     func testWhiteCastlingRights() {
         var position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R w kq")
-        var result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        var result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertFalse(result.containsCastling(whiteKingside))
         XCTAssertFalse(result.containsCastling(whiteQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R w Kkq")
-        result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertTrue(result.containsCastling(whiteKingside))
         XCTAssertFalse(result.containsCastling(whiteQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R w Qkq")
-        result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertFalse(result.containsCastling(whiteKingside))
         XCTAssertTrue(result.containsCastling(whiteQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R w KQkq")
-        result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertTrue(result.containsCastling(whiteKingside))
         XCTAssertTrue(result.containsCastling(whiteQueenside))
     }
     
     func testBlackCastlingRights() {
         var position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R b KQ")
-        var result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        var result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertFalse(result.containsCastling(blackKingside))
         XCTAssertFalse(result.containsCastling(blackQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R b KQk")
-        result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertTrue(result.containsCastling(blackKingside))
         XCTAssertFalse(result.containsCastling(blackQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R b KQq")
-        result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertFalse(result.containsCastling(blackKingside))
         XCTAssertTrue(result.containsCastling(blackQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3K2R b KQkq")
-        result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertTrue(result.containsCastling(blackKingside))
         XCTAssertTrue(result.containsCastling(blackQueenside))
     }
     
     func testCastlingPreventedBySelf() {
         var position = parseFen("r3k2r/8/8/8/8/8/8/RN2KB1R w KQ")
-        var result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        var result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertFalse(result.containsCastling(whiteKingside))
         XCTAssertFalse(result.containsCastling(whiteQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/RN2K2R w KQ")
-        result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertTrue(result.containsCastling(whiteKingside))
         XCTAssertFalse(result.containsCastling(whiteQueenside))
         
         position = parseFen("r3k2r/8/8/8/8/8/8/R3KB1R w KQ")
-        result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertFalse(result.containsCastling(whiteKingside))
         XCTAssertTrue(result.containsCastling(whiteQueenside))
     }
     
     func testCastlingPreventedByOpponent() {
         let position = parseFen("r3k2r/8/8/8/2q5/8/8/R3K2R w KQ")
-        let result = MoveGenerator.run(position: position, player: position.playerToMove).getMoves(position: position)
+        let result = MoveGenerator.run(position: position, player: position.playerToMove)
         XCTAssertFalse(result.containsCastling(whiteKingside))
         XCTAssertFalse(result.containsCastling(whiteQueenside))
     }
@@ -313,6 +313,6 @@ final class MoveGeneratorTests: XCTestCase {
         let dto = try! Notation.parseFen(fen: fen)
         let position = try! Position(dto: dto)
         let moveList = MoveGenerator.run(position: position, player: position.playerToMove)
-        return moveList.getMoves(position: position)
+        return moveList
     }
 }

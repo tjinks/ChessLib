@@ -13,8 +13,7 @@ enum MateCheckResult {
 
 extension Position {
     func mateCheck() -> MateCheckResult {
-        let movelist = MoveGenerator.run(position: self, player: playerToMove)
-        let legalMoves = movelist.getMoves(position: self)
+        let legalMoves = MoveGenerator.run(position: self, player: playerToMove)
         if legalMoves.isEmpty {
             if self.isInCheck(player: playerToMove) {
                 return .checkmate

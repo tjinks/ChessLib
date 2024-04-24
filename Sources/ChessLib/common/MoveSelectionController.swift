@@ -123,8 +123,8 @@ class MoveSelectionController {
     
     private func getMovesStartingFrom(_ square: Int) -> [Move] {
         let position = gameState!.currentPosition
-        let moveList = MoveGenerator.run(position: position, player: position.playerToMove)
-        return moveList.getMoves(position: position).filter {
+        let moves = MoveGenerator.run(position: position, player: position.playerToMove)
+        return moves.filter {
             return $0.from == square
         }
     }
