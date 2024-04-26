@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum Move {
+public enum Move : Equatable {
     case whiteCastlesLong
     case whiteCastlesShort
     case blackCastlesLong
@@ -16,6 +16,17 @@ public enum Move {
 }
 
 extension Move {
+    var isCastles: Bool {
+        get {
+            switch self {
+            case .normal:
+                return false
+            default:
+                return true
+            }
+        }
+    }
+    
     var from: Int {
         get {
             switch self {

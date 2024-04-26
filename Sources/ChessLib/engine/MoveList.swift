@@ -12,14 +12,14 @@ struct MoveListItem {
     var score: Double
 }
 
-class MoveList {
+struct MoveList {
     private var items: [MoveListItem]
     
     init() {
         items = []
     }
     
-    func add(move: Move, score: Double) {
+    mutating func add(move: Move, score: Double) {
         items.append(MoveListItem(move: move, score: score))
     }
     
@@ -27,21 +27,16 @@ class MoveList {
         return items.count
     }
     
-    func getMoves(position: Position) -> [Move] {
+    subscript(index: Int) -> Move {
+        get {
+            return items[index].move
+        }
+    }
+    
+    mutating func sort() {
         items.sort() {
             return $0.score > $1.score
         }
-        
-        var result: [Move] = []
-        
-        for item in items {
-            let newPosition = position.makeMove(item.move)
-            if !newPosition.isInCheck(player: position.playerToMove) {
-                result.append(item.move)
-            }
-        }
-        
-        return result
     }
 }
 
