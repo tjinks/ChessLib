@@ -142,6 +142,11 @@ extension GameState {
             return .draw
         }
         
+        let analysisInfo = AnalysisInfo(gameState: self)
+        if analysisInfo.totalPieces == 2 {
+            return .draw
+        }
+        
         return .none
     }
 }

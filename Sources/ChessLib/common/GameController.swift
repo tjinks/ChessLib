@@ -32,9 +32,29 @@ public class GameController {
     private var mode = RunMode.humanVsHuman
     private var gameState: GameState? = nil
     private var state = noopEventHandler
+    private let aba = Aba()
+    
+    private struct ComputerObserver: MoveSelectionObserver {
+        let dispatcher: EventDispatcher
+        
+        func reportProgress(_ progress: Progress) {
+            
+        }
+        
+        func moveSelected(move: Move, score: Double) {
+            dispatcher.dispatch(InternalEvent.moveSelected(move: move))
+        }
+        
+        func selectionAborted() {
+            
+        }
+    }
+    
+    private let observer: ComputerObserver
     
     public init(dispatcher: EventDispatcher) {
         self.dispatcher = dispatcher
+        observer = ComputerObserver(dispatcher: dispatcher)
         dispatcher.register(processEvent)
         _ = MoveSelectionController(dispatcher: dispatcher)
         state = notPlaying
@@ -43,18 +63,6 @@ public class GameController {
     
     private func processEvent(_ event: Any) {
         state(event)
-        /*
-        if let setGameState = event as? SetGameState {
-            processSetGameState(setGameState.fen)
-        } else if let moveSelected = event as? MoveSelected {
-            let move = moveSelected.move
-            gameState!.makeMove(move)
-            dispatcher.dispatch(GlobalEvent.showGameState(state: gameState!.toDto()))
-        } else if let setRunMode = event as? SetRunMode {
-            
-        }
-        */
-        
     }
     
     private func notPlaying(event: Any) {
@@ -65,27 +73,52 @@ public class GameController {
             case .setRunMode(let runMode):
                 mode = runMode
             case .startGame:
-                state = playingHumanVsHuman
-                dispatcher.dispatch(InternalEvent.startHumanMoveSelection(gameState: gameState!))
+                switch mode {
+                case .humanVsHuman:
+                    state = playingHumanVsHuman
+                    dispatcher.dispatch(InternalEvent.startHumanMoveSelection(gameState: gameState!))
+                case .humanVsComputer:
+                    state = playingComputerVsHumanHumanMove
+                    dispatcher.dispatch(InternalEvent.startHumanMoveSelection(gameState: gameState!))
+                default:
+                    break
+                }
+                
             default:
                 break
             }
         }
     }
     
-    private func playingHumanVsHuman(event: Any) {
+    private func playingComputerVsHumanHumanMove(event: Any) {
         let gameState = gameState!
         if let event = event as? InternalEvent {
             switch event {
             case .moveSelected(let move):
-                gameState.makeMove(move)
-                dispatcher.dispatch(GlobalEvent.showGameState(state: gameState.toDto()))
-                let result = gameState.getResult()
-                if result != .none {
-                    dispatcher.dispatch(GlobalEvent.gameOver(result: result))
-                    state = notPlaying
+                let result = onMoveSelected(move)
+                if result == .none {
+                    state = playingComputerVsHumanComputerMove(event:)
+                    aba.startMoveSelection(gameState: gameState, observer: observer)
                 } else {
+                    state = notPlaying
+                }
+            default:
+                break
+            }
+        }
+    }
+
+    private func playingComputerVsHumanComputerMove(event: Any) {
+        let gameState = gameState!
+        if let event = event as? InternalEvent {
+            switch event {
+            case .moveSelected(let move):
+                let result = onMoveSelected(move)
+                if result == .none {
+                    state = playingComputerVsHumanHumanMove
                     dispatcher.dispatch(InternalEvent.startHumanMoveSelection(gameState: gameState))
+                } else {
+                    state = notPlaying
                 }
             default:
                 break
@@ -93,12 +126,39 @@ public class GameController {
         }
     }
     
-    private func processMoveSelected(move: Move) {
-        switch state {
-        default:
-            // TODO
-            break
+
+    private func playingHumanVsHuman(event: Any) {
+        let gameState = gameState!
+        if let event = event as? InternalEvent {
+            switch event {
+            case .moveSelected(let move):
+                let result = onMoveSelected(move)
+                if result == .none {
+                    dispatcher.dispatch(InternalEvent.startHumanMoveSelection(gameState: gameState))
+                } else {
+                    state = notPlaying
+                }
+            default:
+                break
+            }
         }
+    }
+    
+    private func startComputerMoveSelection() {
+        
+    }
+    
+    private func onMoveSelected(_ move: Move) -> Result {
+        let gameState = gameState!
+        gameState.makeMove(move)
+        dispatcher.dispatch(GlobalEvent.showGameState(state: gameState.toDto()))
+        let result = gameState.getResult()
+        if result != .none {
+            dispatcher.dispatch(GlobalEvent.gameOver(result: result))
+            state = notPlaying
+        }
+        
+        return result
     }
     
     private func processSetGameState(_ fen: String) {

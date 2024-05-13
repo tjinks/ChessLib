@@ -68,8 +68,8 @@ extension Move {
     
     func isEpCapture(_ position: Position) -> Bool {
         switch self {
-        case .normal(_, let to, _):
-            return to == position.epSquare
+        case .normal(let from, let to, _):
+            return to == position.epSquare && position.board[from].type == .pawn
         default:
             return false
         }
