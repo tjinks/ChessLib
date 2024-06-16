@@ -14,8 +14,8 @@ class MoveSelectionController {
         case waitingForPromotionDialog
     }
     
-    private var gameState: GameState?
-    private var potentialMoves: [Move]?
+    private var game: EngGame?
+    private var potentialMoves: [EngMove]?
     
     private var state = State.inactive
     private var initialSquare: Int = -1
@@ -27,68 +27,59 @@ class MoveSelectionController {
         dispatcher.register(processEvent)
     }
     
-    private func processEvent(_ event: Any) {
-        if let event = event as? GlobalEvent {
-            switch event {
-            case .squareClicked(let square):
-                processClick(square: square)
-            case .promoteTo(let pieceType):
-                processPromotion(to: pieceType)
-            default:
-                break
-            }
-        } else if let event = event as? InternalEvent {
-            if state == .inactive {
-                switch event {
-                case .startHumanMoveSelection(let gameState):
-                    self.gameState = gameState
-                    state = .beforeInitialSquareSelected
-                default:
-                    break
-                }
-            }
-        }
-    }
-    
-    private func processClick(square: Int) {
-        switch state {
-        case .beforeInitialSquareSelected:
-            let potentialMoves = getMovesStartingFrom(square)
-            if potentialMoves.count > 0 {
-                var highlights = potentialMoves.map { return $0.to }
-                highlights.append(square)
-                self.potentialMoves = potentialMoves
-                state = .afterInitialSquareSelected
-                dispatcher.dispatch(GlobalEvent.showHighlights(highlights: highlights))
-            } else {
-                dispatcher.dispatch(GlobalEvent.showHighlights(highlights: []))
-            }
-
-        case .afterInitialSquareSelected:
-            let moves = getMovesEndingAt(square)
-            if moves.count > 0 {
-                let move = moves[0]
-                switch move {
-                case .normal(_, _, let promoteTo):
-                    if promoteTo != nil {
-                        potentialMoves = moves
-                        state = .waitingForPromotionDialog
-                        dispatcher.dispatch(GlobalEvent.showPromotionDialog)
-                        return
-                    }
-                default:
-                    break
-                }
-
-                dispatchMove(move)
-            } else {
-                state = .beforeInitialSquareSelected
-                processClick(square: square)
-            }
-
+    private func processEvent(_ event: Event) {
+        switch event {
+        case .squareClicked(let square):
+            processClick(square: square)
+        case .promoteTo(let pieceType):
+            processPromotion(to: pieceType)
+        case .startHumanMoveSelection(let gameState):
+            self.gameState = gameState
+            state = .beforeInitialSquareSelected
         default:
             break
         }
+    }
+
+
+private func processClick(square: Int) {
+    switch state {
+    case .beforeInitialSquareSelected:
+        let potentialMoves = getMovesStartingFrom(square)
+        if potentialMoves.count > 0 {
+            var highlights = potentialMoves.map { return $0.to }
+            highlights.append(square)
+            self.potentialMoves = potentialMoves
+            state = .afterInitialSquareSelected
+            dispatcher.dispatch(GlobalEvent.showHighlights(highlights: highlights))
+        } else {
+            dispatcher.dispatch(GlobalEvent.showHighlights(highlights: []))
+        }
+        
+    case .afterInitialSquareSelected:
+        let moves = getMovesEndingAt(square)
+        if moves.count > 0 {
+            let move = moves[0]
+            switch move {
+            case .normal(_, _, let promoteTo):
+                if promoteTo != nil {
+                    potentialMoves = moves
+                    state = .waitingForPromotionDialog
+                    dispatcher.dispatch(GlobalEvent.showPromotionDialog)
+                    return
+                }
+            default:
+                break
+            }
+            
+            dispatchMove(move)
+        } else {
+            state = .beforeInitialSquareSelected
+            processClick(square: square)
+        }
+        
+    default:
+        break
     }
     
     private func processPromotion(to: PieceType) {
@@ -117,7 +108,7 @@ class MoveSelectionController {
                 return false
             }
         }
-
+        
         return matching[0]
     }
     
